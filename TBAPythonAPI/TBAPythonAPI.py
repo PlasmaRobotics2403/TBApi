@@ -3,7 +3,7 @@ import sys
 import requests
 
 class TBAParser:
-  def __init__(self, teamNumber, packageID, versionID)
+  def __init__(self, teamNumber, packageID, versionID):
     self.teamNumber = teamNumber
     self.packageID = packageID
     self.versionID = versionID
