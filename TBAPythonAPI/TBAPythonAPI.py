@@ -32,9 +32,7 @@ class TBAParser:
 
                 try:
                     if not partial_list[0] is None:
-                        print(partial_list[0]["motto"])
                         full_list = full_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
-                        print(full_list[0]["nickname"])
                     else:
                         break
                 except:
