@@ -1,1 +1,1 @@
-import .TBAPythonAPI
+from TBAPythonAPI.TBAPythonAPI import TBAParser
