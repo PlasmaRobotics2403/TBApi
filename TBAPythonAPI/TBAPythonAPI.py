@@ -12,7 +12,7 @@ class TBAParser:
 
   #Team Info
   
-  def get_team_obj(self, teamNumber)
+  def get_team_obj(self, teamNumber):
     
     request = (self.baseURL + /team/frc + teamNumber)
     response = requests.get(myRequest, headers=header)
@@ -20,12 +20,14 @@ class TBAParser:
     
     return dictionary
     
-  def get_team_full_name(self, teamNumber)
+  def get_team_full_name(self, teamNumber):
     team_dictionary = get_team_obj(teamNumber)
     full_name = team_dictionary['name']
     return full_name
     
-  def get_team_nick_name(self, teamNumber)
+  def get_team_nick_name(self, teamNumber):
     team_dictionary = getTeamObj(teamNumber)
     nick_name = team_dictionary['nickname']
     return nick_name
+    
+  def get_team_number(self, teamNumber):
