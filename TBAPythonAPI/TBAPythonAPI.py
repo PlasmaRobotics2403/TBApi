@@ -15,36 +15,32 @@ class TBAParser:
     #Team Info
 
     def __get_list_by_page(self, page): #Class Function, get's a team list by page.
+        print("pulling page " + str(page))
         request = (self.baseURL + "/teams/" + str(page))
         response = requests.get(request, headers = self.header)
         response_list = response.json()
         return response_list
 
-    def __get_last_team_list(self): #Class Function, brute-forces the last page of teams
-        checkpage = 0
-
-        for page in range(0,100): #Plenty of room for team expansion, up to 55000 teams.  API will probably be on v3 or greater by then.
-            content = self.__get_list_by_page(page)
-            try:
-                if not content[0] is None:
-                    checkpage += 1
-                else:
-                    return checkpage
-            except:
-                return checkpage
-
-    def get_team_list_obj(self, page=None): #get team lists, either by page, or brute forcing the entire list
-        if page:
+    def get_team_list_obj(self, page=None): #get team lists, either by page, or brute forcing the entire list #Bug with Unicode in one team's name.  Be carefull to process Unicode in output.  We didn't filter it out here because someone might want to display that team's name with the horsehead in place.
+        if not page is None:
             full_list = self.__get_list_by_page(page)
         else:
-            lastpage = self.__get_last_team_list()
             full_list = []
 
-            for page in range(0, lastpage): #From first page to calculated last page through self.__get_last_team_list
+            for page in range(0, 100): #Code will exit out of the loop when it hits a NULL value.  There is plenty of room for team expansion, up to 55000 teams.  API will probably be on v3 or greater at this point.
                 partial_list = self.get_team_list_obj(page)
-                full_list = full_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
 
-            return full_list
+                try:
+                    if not partial_list[0] is None:
+                        print(partial_list[0]["motto"])
+                        full_list = full_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
+                        print(full_list[0]["nickname"])
+                    else:
+                        break
+                except:
+                    break
+
+        return full_list
 
     def get_team_obj(self, team_number): #get the full 'team' object for the given team number
         request = (self.baseURL + "/team/frc" + str(team_number))
