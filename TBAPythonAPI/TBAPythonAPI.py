@@ -15,7 +15,6 @@ class TBAParser:
     #Team Info
 
     def __get_list_by_page(self, page): #Class Function, get's a team list by page.
-        print("pulling page " + str(page))
         request = (self.baseURL + "/teams/" + str(page))
         response = requests.get(request, headers = self.header)
         response_list = response.json()
@@ -28,7 +27,7 @@ class TBAParser:
             full_list = []
 
             for page in range(0, 100): #Code will exit out of the loop when it hits a NULL value.  There is plenty of room for team expansion, up to 55000 teams.  API will probably be on v3 or greater at this point.
-                partial_list = self.get_team_list_obj(page)
+                partial_list = self.__get_list_by_page(page)
 
                 try:
                     if not partial_list[0] is None:
@@ -37,7 +36,7 @@ class TBAParser:
                         break
                 except:
                     break
-
+                    
         return full_list
 
     def get_team_obj(self, team_number): #get the full 'team' object for the given team number
