@@ -31,3 +31,6 @@ class TBAParser:
     return nick_name
     
   def get_team_number(self, teamNumber):
+    team_dictionary = getTeamObj(teamNumber)
+    team_number = team_dictionary['team_number']
+    return team_number
