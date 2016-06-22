@@ -14,6 +14,7 @@ class TBAParser:
 
     #Team Info
 
+<<<<<<< HEAD
     def get_team_obj(self, teamNumber):
 
         request = (self.baseURL + "/team/frc" + str(teamNumber))
@@ -28,6 +29,23 @@ class TBAParser:
 
     def get_team_nick_name(self, teamNumber):
         team_dictionary = self.get_team_obj(teamNumber)
+=======
+    def get_team_obj(self, team_number):
+
+        request = (self.baseURL + "/team/frc" + str(team_number))
+        response = requests.get(request, headers=header)
+        dictionary = response.json()
+
+        return dictionary
+
+    def get_team_full_name(self, team_number):
+        team_dictionary = self.get_team_obj(team_number)
+        full_name = team_dictionary['name']
+        return full_name
+
+    def get_team_nick_name(self, team_number):
+        team_dictionary = self.get_team_obj(team_number)
+>>>>>>> da238dfb843f74f6ef376976e53b1ea1bd81a3b0
         nick_name = team_dictionary['nickname']
         return nick_name
 
@@ -75,6 +93,7 @@ class TBAParser:
         team_dictionary = self.get_team_obj(team_number)
         motto = team_dictionary['motto']
         return motto
+<<<<<<< HEAD
 
 
     #Event Info
@@ -194,3 +213,5 @@ class TBAParser:
         event_dictionary = self.get_event_obj(eventKey)
         event_event_type = event_dictionary['event_type']
         return event_event_type
+=======
+>>>>>>> da238dfb843f74f6ef376976e53b1ea1bd81a3b0
