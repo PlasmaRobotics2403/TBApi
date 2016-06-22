@@ -78,6 +78,27 @@ class TBAParser:
 
     #Event Info
 
+    def find_event_key(self, year, name = 'all'):           #Based on method from https://github.com/Alexanders101/The-Blue-Alliance-Python-API/
+        request = (self.baseURL + "/events/" + str(year))
+        response = requests.get(request, headers = self.header)
+        dictionary = response.json()
+        events = np_array([[str(event['short_name']), str(event['key'])] for event in dictionary])
+        if name is 'all':
+            return events
+        else:
+            ret = ''
+            for sub in events[:, 0]:
+                if sub[:len(name)] == name:
+                    if not ret == '':
+                        print("Multiple events found. Please refine your search.")
+                        return '1'
+                    ret = sub
+            curr = events[events[:, 0] == ret]
+            if len(ret) == 0:
+                print('No events found. Please ensure spelling and capitalization are correct.')
+                return '0'
+            return curr[0][1]
+
     def get_event_obj(self, eventKey):
         request = (self.baseURL + "/event/" + eventKey)
         response = requests.get(request, headers = self.header)
