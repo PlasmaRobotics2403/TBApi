@@ -14,7 +14,7 @@ class TBAParser:
 
     #Team Info
 
-    def get_team_list_obj(self, page):
+    def __get_list_by_page(self, page):
         request = (self.baseURL + "/teams/" + str(page))
         response = requests.get(request, headers = self.header)
         response_list = response.json()
@@ -33,15 +33,18 @@ class TBAParser:
             except:
                 return checkpage
 
-    def get_team_full_list_obj(self):
-        lastpage = self.__get_last_team_list()
-        full_list = []
+    def get_team_list_obj(self, page=None):
+        if page:
+            full_list = self.__get_list_by_page(page)
+        else:
+            lastpage = self.__get_last_team_list()
+            full_list = []
 
-        for page in range(0, lastpage): #From first page to calculated last page through self.__get_last_team_list
-            partial_list = self.get_team_list_obj(page)
-            full_list = full_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
+            for page in range(0, lastpage): #From first page to calculated last page through self.__get_last_team_list
+                partial_list = self.get_team_list_obj(page)
+                full_list = full_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
 
-        return full_list
+            return full_list
 
     def get_team_obj(self, team_number): #get the full 'team' object for the given team number
         request = (self.baseURL + "/team/frc" + str(team_number))
