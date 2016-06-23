@@ -95,7 +95,7 @@ class TBAParser:
 
         for team in json_list:
             team_obj = TBATeam(team)
-            team_list = obj_list + [team_obj]
+            team_list = team_list + [team_obj]
 
         return team_list
 
