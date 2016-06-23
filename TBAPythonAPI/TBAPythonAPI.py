@@ -155,3 +155,15 @@ class TBAParser:
                 event_list = event_list + partial_list
 
         return event_list
+
+    def get_team_event_awards(self, team_key, event_key):
+        request = (self.baseURL + "/team/" + team_key + "/event/" + event_key + "/awards")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        award_list = []
+
+        for award in json:
+            award_obj = TBAAward(award)
+            award_list = award_list + [award_obj]
+
+        return award_list
