@@ -2,6 +2,7 @@
 import os
 import sys
 import requests
+import datetime
 
 class TBATeam:
     def __init__(self, raw_json):
@@ -88,7 +89,7 @@ class TBAParser:
         self.header = {'X-TBA-App-Id': 'frc{team}:{package}:{version}'.format(team = team_number, package = package_name, version = version_number)}
         self.baseURL = 'http://www.thebluealliance.com/api/v2'
 
-    def __get_team_list_by_page(self, page): #Helper function to make code for get_team_list simpler.
+    def __pull_team_list_by_page(self, page): #Helper function to make code for get_team_list simpler.
         request = (self.baseURL + "/teams/" + str(page))
         response = requests.get(request, headers = self.header)
         json_list = response.json()
@@ -102,12 +103,12 @@ class TBAParser:
 
     def get_team_list(self, page = None): #get list of FRC teams' TBATeam objects, either the entire list, or by page #
         if not page is None:
-            team_list = __get_team_list_by_page
+            team_list = __pull_team_list_by_page
         else:
             team_list = []
 
             for page in range(0,100): #Allows for significant team-expansion (up to 55000 FRC teams).  At that point in time, we will probably be on APIv3 or more.
-                partial_list = self.__get_team_list_by_page(page)
+                partial_list = self.__pull_team_list_by_page(page)
 
                 try:
                     if not partial_list[0] is None:
@@ -126,3 +127,31 @@ class TBAParser:
         team_object = TBATeam(json)
 
         return team_object
+
+    def __pull_team_events(self, team_key, year):
+        request = (self.baseURL + "/team/" + team_key + "/" + year + "/events")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        event_list = []
+
+        for event in json:
+            event_obj = TBAEvent(event)
+            event_list = event_list + [event_obj]
+
+        return event_list
+
+    def get_team_events(self, team_key, year=None):
+        if not year is None:
+            event_list = self.__pull_team_events(team_key, year)
+        else:
+            rookie_year = self.get_team(team_key).rookie_year
+            current_year = datetime.datetime.now().year
+
+            event_list = []
+
+            for check_year in range(rookie_year, current_year):
+                partial_list = __pull_team_list_by_page(team_key, check_year)
+
+                event_list = event_list + partial_list
+
+        return event_list
