@@ -87,11 +87,41 @@ class TBAParser:
         self.header = {'X-TBA-App-Id': 'frc{team}:{package}:{version}'.format(team = team_number, package = package_name, version = version_number)}
         self.baseURL = 'http://www.thebluealliance.com/api/v2'
 
-    def get_team(self, team_key):
+    def __get_team_list_by_page(self, page): #Helper function to make code for get_team_list simpler.
+        request = (self.baseURL + "/teams/" + str(page))
+        response = requests.get(request, headers = self.header)
+        json_list = response.json()
+        team_list = []
+
+        for team in json_list:
+            team_obj = TBATeam(team)
+            team_list = obj_list + [team_obj]
+
+        return team_list
+
+    def get_team_list(self, page = None): #get list of FRC teams' TBATeam objects, either the entire list, or by page #
+        if not page is None:
+            team_list = __get_team_list_by_page
+        else:
+            team_list = []
+
+            for page in range(0,100): #Allows for significant team-expansion (up to 55000 FRC teams).  At that point in time, we will probably be on APIv3 or more.
+                partial_list = self.__get_team_list_by_page(page)
+
+                try:
+                    if not partial_list[0] is None:
+                        team_list = team_list + partial_list #combine partial with previously set up 'full' list to grow list as we iterate over the range of pages
+                    else:
+                        break #kill loop once we hit NULL data
+                except:
+                    break #kill loop once we hit NULL data
+
+        return team_list
+
+    def get_team(self, team_key): #get a team's TBATeam object
         request = (self.baseURL + "/team/" + team_key)
         response = requests.get(request, headers = self.header)
         json = response.json()
-
         team_object = TBATeam(json)
 
         return team_object
