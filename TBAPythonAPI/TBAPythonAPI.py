@@ -1,3 +1,7 @@
+import os
+import sys
+import requests
+
 class TBATeam:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -35,7 +39,6 @@ class TBAEvent:
         self.event_type_string = raw_json['event_type_string']
         self.start_date = raw_json['start_date']
         self.event_type = raw_json['event_type']
-
 
 class TBAMatch:
     def __init__(self, raw_json):
@@ -75,6 +78,7 @@ class TBARobot:
         self.key = raw_json['key']
         self.year = raw_json['year']
 
+
 class TBAParser:
     def __init__(self, team_number, package_name, version_number):
         self.team_number = team_number
@@ -82,3 +86,12 @@ class TBAParser:
         self.version_number = version_number
         self.header = {'X-TBA-App-Id': 'frc{team}:{package}:{version}'.format(team = team_number, package = package_name, version = version_number)}
         self.baseURL = 'http://www.thebluealliance.com/api/v2'
+
+    def get_team(self, team_key):
+        request = (self.baseURL + "/team/" + team_key)
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        team_object = TBATeam(json)
+
+        return team_object
