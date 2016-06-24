@@ -235,3 +235,12 @@ class TBAParser:
             award_list = award_list + [award_obj]
 
         return award_list
+
+    def get_team_history_robots(self, team_key):
+        request = (self.baseURL + "/team/" + team_key + "/history/robots")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        robo_container_obj = TBARobotGroup(json)
+
+        return robo_container_obj
