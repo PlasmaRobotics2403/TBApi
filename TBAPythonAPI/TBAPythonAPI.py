@@ -61,6 +61,7 @@ class TBAAward:
         self.raw = raw_json
         self.event_key = raw_json['event_key']
         self.award_type = raw_json['award_type']
+        self.type = raw_json['award_type']
         self.name = raw_json['name']
         self.recipient_list = raw_json['recipient_list']
         self.year = raw_json['year']
