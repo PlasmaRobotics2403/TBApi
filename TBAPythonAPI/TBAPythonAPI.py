@@ -47,6 +47,7 @@ class TBAMatch:
         self.raw = raw_json
         self.comp_level = raw_json['comp_level']
         self.match_number = raw_json['match_number']
+        self.number = raw_json['match_number']
         self.videos = raw_json['videos']
         self.time_string = raw_json['time_string']
         self.set_number = raw_json['set_number']
@@ -114,7 +115,7 @@ class TBAParser:
 
     def get_team_list(self, page = None): #get list of FRC teams' TBATeam objects, either the entire list, or by page #
         if not page is None:
-            team_list = __pull_team_list_by_page
+            team_list = self.__pull_team_list_by_page
         else:
             team_list = []
 
@@ -140,7 +141,7 @@ class TBAParser:
         return team_object
 
     def __pull_team_events(self, team_key, year):
-        request = (self.baseURL + "/team/" + team_key + "/" + year + "/events")
+        request = (self.baseURL + "/team/" + team_key + "/" + str(year) + "/events")
         response = requests.get(request, headers = self.header)
         json = response.json()
         event_list = []
@@ -190,12 +191,12 @@ class TBAParser:
 
         for match in json:
             match_obj = TBAMatch(match)
-            match_list = award_list + [award_obj]
+            match_list = match_list + [match_obj]
 
         return match_list
 
-    def __pull_team_media(team_key, year):
-        request = (self.baseURL + "/team/" + team_key + "/" + year + "/media")
+    def __pull_team_media(self, team_key, year):
+        request = (self.baseURL + "/team/" + team_key + "/" + str(year) + "/media")
         response = requests.get(request, headers = self.header)
         json = response.json()
         media_list = []
@@ -208,21 +209,21 @@ class TBAParser:
 
     def get_team_media(self, team_key, year = None):
         if not year is None:
-            media_list = __pull_team_media(team_key, year)
+            media_list = self.__pull_team_media(team_key, year)
         else:
-            rookie_year = get_team(team_key).rookie_year
+            rookie_year = self.get_team(team_key).rookie_year
             current_year = datetime.datetime.now().year
 
             media_list = []
 
             for check_year in range(rookie_year, current_year):
-                partial_list = __pull_team_media(team_key, check_year)
+                partial_list = self.__pull_team_media(team_key, check_year)
                 media_list = media_list + partial_list
 
         return media_list
 
     def get_team_history_events(self, team_key):
-        events_list = __pull_all_team_events(team_key)
+        events_list = self.__pull_all_team_events(team_key)
         return events_list
 
     def get_team_history_awards(self, team_key):
