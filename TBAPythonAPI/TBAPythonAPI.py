@@ -179,3 +179,30 @@ class TBAParser:
             match_list = award_list + [award_obj]
 
         return match_list
+
+    def __pull_team_media(team_key, year):
+        request = (self.baseURL + "/team/" + team_key + "/" + year + "/media")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        media_list = []
+
+        for media in json:
+            media_obj = TBAMedia(media)
+            media_list = media_list + [media_obj]
+
+        return media_list
+
+    def get_team_media(self, team_key, year = None):
+        if not year is None:
+            media_list = __pull_team_media(team_key, year)
+        else:
+            rookie_year = get_team(team_key).rookie_year
+            current_year = datetime.datetime.now().year
+
+            media_list = []
+
+            for check_year in range(rookie_year, current_year):
+                partial_list = __pull_team_media(team_key, check_year)
+                media_list = media_list + partial_list
+
+        return media_list
