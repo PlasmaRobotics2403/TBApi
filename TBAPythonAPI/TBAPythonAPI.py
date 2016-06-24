@@ -140,20 +140,23 @@ class TBAParser:
 
         return event_list
 
+    def __pull_all_team_events(self, team_key):
+        request = (self.baseURL + "/team/" + team_key + "/history/events")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        event_list = []
+
+        for event in json:
+            event_obj = TBAEvent(event)
+            event_list = event_list + [event_obj]
+
+        return event_list
+
     def get_team_events(self, team_key, year=None):
         if not year is None:
             event_list = self.__pull_team_events(team_key, year)
         else:
-            rookie_year = self.get_team(team_key).rookie_year
-            current_year = datetime.datetime.now().year
-
-            event_list = []
-
-            for check_year in range(rookie_year, current_year):
-                partial_list = __pull_team_list_by_page(team_key, check_year)
-
-                event_list = event_list + partial_list
-
+            event_list = self.__pull_all_team_events(team_key)
         return event_list
 
     def get_team_event_awards(self, team_key, event_key):
@@ -206,3 +209,7 @@ class TBAParser:
                 media_list = media_list + partial_list
 
         return media_list
+
+    def get_team_history_events(self, team_key):
+        events_list = __pull_all_team_events(team_key)
+        return events_list
