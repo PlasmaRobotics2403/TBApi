@@ -72,6 +72,16 @@ class TBAMedia:
         self.details = raw_json['details']
         self.foreign_key = raw_json['foreign_key']
 
+class TBARobotGroup:
+    def __init__(self, raw_json):
+        self.raw = raw_json
+
+    def get_year(self, year):
+        year_json = self.raw[str(year)]
+        year_obj = TBARobot(year_json)
+
+        return year_obj
+
 class TBARobot:
     def __init__(self, raw_json):
         self.raw = raw_json
