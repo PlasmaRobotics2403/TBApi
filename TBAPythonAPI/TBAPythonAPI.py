@@ -213,3 +213,15 @@ class TBAParser:
     def get_team_history_events(self, team_key):
         events_list = __pull_all_team_events(team_key)
         return events_list
+
+    def get_team_history_awards(self, team_key):
+        request = (self.baseURL + "/team/" + team_key + "/history/awards")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        award_list = []
+
+        for award in json:
+            award_obj = TBAAward(award)
+            award_list = award_list + [award_obj]
+
+        return award_list
