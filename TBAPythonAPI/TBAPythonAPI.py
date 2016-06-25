@@ -246,3 +246,50 @@ class TBAParser:
         robo_container_obj = TBARobotGroup(json)
 
         return robo_container_obj
+
+    def get_event_list(self, year):
+        request = (self.baseURL + "/events/" + str(year))
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+        event_list = []
+
+        for event in json:
+            event_obj = TBAEvent(event)
+            event_list = event_list + [event_obj]
+
+        return event_list
+
+    def get_event(self, event_key):
+        request = (self.baseURL + "/event/" + event_key)
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        event_obj = TBAEvent(json)
+
+        return event_obj
+
+    def get_event_teams(self, event_key):
+        request = (self.baseURL + "/event/" + event_key + "/teams")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        team_list = []
+
+        for team in json:
+            team_obj = TBATeam(team)
+            team_list = team_list + [team_obj]
+
+        return team_list
+
+    def get_event_matches(self, event_key):
+        request = (self.baseURL + "/event" + event_key + "/matches")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        match_list = []
+
+        for match in json:
+            match_obj = TBAMatch(match)
+            match_list = match_list + [match_obj]
+
+        return match_list
