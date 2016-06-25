@@ -293,3 +293,16 @@ class TBAParser:
             match_list = match_list + [match_obj]
 
         return match_list
+
+
+
+        # ADetectionAlgorithm's code above here
+
+
+
+
+        # ==
+
+
+
+        # nardavin's code below here
