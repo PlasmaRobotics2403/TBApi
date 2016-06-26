@@ -294,15 +294,50 @@ class TBAParser:
 
         return match_list
 
+    def get_event_awards(self, event_key):
+        request = (self.baseURL + "/event" + event_key + "/awards")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
 
+        award_list = []
 
-        # ADetectionAlgorithm's code above here
+        for award in json:
+            award_obj = TBAAward(award)
+            award_list = award_list + [award_obj]
 
+        return award_list
 
+    def get_match(self, match_key):
+        request = (self.baseURL + "/match/" + match_key)
+        response = requests.get(request, headers = self.header)
+        json = response.json()
 
+        match_obj = TBAMatch(json)
 
-        # ==
+        return match_obj
 
+    def get_district_events(self, district_key, year):
+        request = (self.baseURL + "/district/" + district_key + "/" + str(year) + "/events")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
 
+        event_list = []
 
-        # nardavin's code below here
+        for event in json:
+            event_obj = TBAEvent(event)
+            event_list = event_list + [event_obj]
+
+        return event_list
+
+    def get_district_teams(self, district_key, year):
+        request = (self.baseURL + "/district/" + district_key + "/" + str(year) + "/teams")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        team_list = []
+
+        for team in json:
+            team_obj = TBATeam(event)
+            team_list = team_list + [team_obj]
+
+        return event_list
