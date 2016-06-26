@@ -195,6 +195,13 @@ class TBAParser:
 
         return match_list
 
+    def get_team_years_participated(self, team_key):
+        request = (self.baseURL + "/team/" + team_key + "/years_participated")
+        response = requests.get(request, headers = self.header)
+        years_participated = response.json()
+
+        return years_participated
+
     def __pull_team_media(self, team_key, year):
         request = (self.baseURL + "/team/" + team_key + "/" + str(year) + "/media")
         response = requests.get(request, headers = self.header)
@@ -246,6 +253,13 @@ class TBAParser:
         robo_container_obj = TBARobotGroup(json)
 
         return robo_container_obj
+
+    def get_team_history_districts(self, team_key):
+        request = (self.baseURL + "/team/" + team_key + "/history/robots")
+        response = requests.get(request, headers = self.header)
+        team_history_districts = response.json()
+
+        return team_history_districts
 
     def get_event_list(self, year):
         request = (self.baseURL + "/events/" + str(year))
