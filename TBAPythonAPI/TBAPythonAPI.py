@@ -82,21 +82,23 @@ class TBAEventStatsObj:
 
 class TBAEventRankings:
     def __init__(self, raw_json):
-        self.keys = []
+        self.raw = raw_json
+        self.keys = raw_json[0]
+
         rank_dictionary = {}
         team_rank_dictionary = {}
+
+        del raw_json[0]
+
         for key in raw_json:
-            if key[0] is 'Rank':
-                self.keys = key
-            else:
-                if self.keys is None:
-                    pass
-                else:
-                    team_dictionary = TBAEventTeamRank(self.keys, key)
-                    team_rank = str(key[0])
-                    team_number = str(key[1])
-                    rank_dictionary[team_rank] = team_dictionary
-                    team_rank_dictionary[team_number] = team_dictionary
+                team_dictionary = TBAEventTeamRank(self.keys, key)
+
+                team_rank = str(key[0])
+                team_number = str(key[1])
+
+                rank_dictionary[team_rank] = team_dictionary
+                team_rank_dictionary[team_number] = team_dictionary
+
         self.rankings = rank_dictionary
         self.team_rankings = team_rank_dictionary
 
@@ -115,13 +117,16 @@ class TBAEventRankings:
             print("\n[TBA-API] BAD TEAM NUMBER SUPLIED WITH TBAEventRankings.get_rank_by_team(team_number)\n")
             return
 
-        team_obj = self.team_rankings(team_number)
+        team_obj = self.team_rankings[team_number]
 
         return team_obj
 
 class TBAEventTeamRank:
     def __init__(self, key_list, team_list):
+        self.raw = team_list
+
         check_pos = 0
+        
         for key in key_list:
             if key is "Record (W-L-T)":
                 key = "record"
