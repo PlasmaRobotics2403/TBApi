@@ -3,6 +3,8 @@ import os
 import sys
 import requests
 import datetime
+import numpy as np
+from numpy import array as np_array
 
 class TBATeam:
     def __init__(self, raw_json):
@@ -463,5 +465,44 @@ class TBAParser:
 
 #nardavin's code below this comment
 
+    def calc_team_key(self, number):
+        key = "frc" + str(number)
+        return key
+
+    #Finds event key from both year and event nickname.
+    #Name variable does not have to be complete, but it must be properly capitalized and specific enough to specify a single event
+    #Returns "0" is no events are found, "1" if more than one event is found, and event key otherwise.
+    #ALL RETURNS ARE STRINGS
+    #Based on method from https://github.com/Alexanders101/The-Blue-Alliance-Python-API/
+    def calc_event_key(self, year, name):
+        request = (self.baseURL + "/events/" + str(year))
+        response = requests.get(request, headers = self.header)
+        dictionary = response.json()
+        events = np_array([[str(event['short_name']), str(event['key'])] for event in dictionary])
+        ret = ''
+        for sub in events[:, 0]:
+            if sub[:len(name)] == name:
+                if not ret == '':
+                    print("Multiple events found. Please refine your search.")
+                    return '1'
+                ret = sub
+        curr = events[events[:, 0] == ret]
+        if len(ret) == 0:
+            print('No events found. Please ensure spelling and capitalization are correct.')
+            return '0'
+        return curr[0][1]
+
+    #Calculates match key from event key, competition level, match number, and, if needed, set number
+    #Event key can be calculated using calc_event_key()
+    #Comp level must be string: "q" for qualifying matches, "ef" for eighth final, "qf" for quarterfinal,
+    #                           "sf" for semifinal or "f" for final
+    #Match number is the standard match number. In elims, count restarts at 1 for every new set
+    #Set number must be included for all requests except quals matches. This must even be included for finals, although it will always be 1
+    def calc_match_key(self, event_key, comp_level, match_number, set_number = None):
+        if not set_number == None:
+            key = event_key + '_' + comp_level + str(set_number) + 'm' + str(match_number)
+        else:
+            key = event_key + '_' + comp_level + 'm' + str(match_number)
+        return key
 
 #like here
