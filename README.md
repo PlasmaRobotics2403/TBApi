@@ -1,5 +1,5 @@
-# TheBlueAPI - A Python Wrapper for the Blue Alliance API
+## TBApi - A Python Wrapper for The Blue Alliance API
 
-This is a work in progress project to improve upon the current TBA-API wrapper options.
+This is an improved API wrapper for the Blue Alliance API.
 
-Documentation to come soon.
+Documentation developing in Wiki and through code comments.
