@@ -42,6 +42,93 @@ class TBAEvent:
         self.start_date = raw_json['start_date']
         self.event_type = raw_json['event_type']
 
+class TBAEventStats:
+    def __init__(self, raw_json):
+        self.raw = raw_json
+        try:
+            self.opr = TBAEventStatsObj(raw_json["oprs"])
+        except:
+            pass
+        try:
+            self.ccwm = TBAEventStatsObj(raw_json["ccwms"])
+        except:
+            pass
+        try:
+            self.dpr = TBAEventStatsObj(raw_json["dprs"])
+        except:
+            pass
+        try:
+            self.year_specific = raw_json['year_specific']
+        except:
+            pass
+
+class TBAEventStatsObj:
+    def __init__(self, raw_json):
+        self.raw = raw_json
+
+    def get_team(self, team_number):
+        if not isinstance(team_number, str):
+            team_number = str(team_number)
+        else:
+            if team_number.startswith('frc'):
+                team_number = team_number[3:]
+
+        if not team_number.isdigit():
+            print("\n[TBA-API] BAD TEAM NUMBER SUPLIED WITH TBAEventStatsObj.get_team(team_number)\n")
+            return
+
+        team_stat = self.raw[team_number]
+        return team_stat
+
+class TBAEventRankings:
+    def __init__(self, raw_json):
+        self.keys = []
+        rank_dictionary = {}
+        team_rank_dictionary = {}
+        for key in raw_json:
+            if key[0] is 'Rank':
+                self.keys = key
+            else:
+                if self.keys is None:
+                    pass
+                else:
+                    team_dictionary = TBAEventTeamRank(self.keys, key)
+                    team_rank = str(key[0])
+                    team_number = str(key[1])
+                    rank_dictionary[team_rank] = team_dictionary
+                    team_rank_dictionary[team_number] = team_dictionary
+        self.rankings = rank_dictionary
+        self.team_rankings = team_rank_dictionary
+
+    def get_rank(self, rank):
+        team_obj = self.rankings[str(rank)]
+        return team_obj
+
+    def get_rank_by_team(self, team_number):
+        if not isinstance(team_number, str):
+            team_number = str(team_number)
+        else:
+            if team_number.startswith('frc'):
+                team_number = team_number[3:]
+
+        if not team_number.isdigit():
+            print("\n[TBA-API] BAD TEAM NUMBER SUPLIED WITH TBAEventRankings.get_rank_by_team(team_number)\n")
+            return
+
+        team_obj = self.team_rankings(team_number)
+
+        return team_obj
+
+class TBAEventTeamRank:
+    def __init__(self, key_list, team_list):
+        check_pos = 0
+        for key in key_list:
+            if key is "Record (W-L-T)":
+                key = "record"
+            key = key.lower().replace(" ", "_").replace("&","and").replace("/","_").replace("-","_")
+            setattr(self, key, team_list[check_pos])
+            check_pos += 1
+
 class TBAMatch:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -307,6 +394,24 @@ class TBAParser:
             match_list = match_list + [match_obj]
 
         return match_list
+
+    def get_event_stats(self, event_key):
+        request = (self.baseURL + "/event/" + event_key + "/stats")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        event_stats = TBAEventStats(json)
+
+        return event_stats
+
+    def get_event_rankings(self, event_key):
+        request = (self.baseURL + "/event/" + event_key + "/rankings")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        event_rankings = TBAEventRankings(json)
+
+        return event_rankings
 
     def get_event_awards(self, event_key):
         request = (self.baseURL + "/event/" + event_key + "/awards")
