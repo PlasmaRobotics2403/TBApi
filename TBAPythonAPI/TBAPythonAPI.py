@@ -6,6 +6,7 @@ import datetime
 import numpy as np
 from numpy import array as np_array
 
+#Class that defines an FRC team. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBATeam:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -21,6 +22,7 @@ class TBATeam:
         self.rookie_year = raw_json['rookie_year']
         self.motto = raw_json['motto']
 
+#Class that defines an FRC event. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBAEvent:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -136,6 +138,7 @@ class TBAEventTeamRank:
             setattr(self, key, team_list[check_pos])
             check_pos += 1
 
+#Class that defines an FRC match. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBAMatch:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -151,6 +154,7 @@ class TBAMatch:
         self.alliances = raw_json['alliances']
         self.event_key = raw_json['event_key']
 
+#Class that defines an FRC award. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBAAward:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -161,6 +165,7 @@ class TBAAward:
         self.recipient_list = raw_json['recipient_list']
         self.year = raw_json['year']
 
+#Class that defines an FRC media item (video, photo, etc). Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBAMedia:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -178,6 +183,7 @@ class TBARobotGroup:
 
         return year_obj
 
+#Class that defines an FRC robot. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBARobot:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -186,9 +192,9 @@ class TBARobot:
         self.key = raw_json['key']
         self.year = raw_json['year']
 
-
+#This is the main class. All reuqests are made through here
 class TBAParser:
-    def __init__(self, team_number, package_name, version_number):
+    def __init__(self, team_number, package_name, version_number): #Init method. Requires info to identify the end user of the requests made to TBA
         self.team_number = team_number
         self.package_name = package_name
         self.version_number = version_number
@@ -258,14 +264,14 @@ class TBAParser:
 
         return event_list
 
-    def get_team_events(self, team_key, year=None):
+    def get_team_events(self, team_key, year=None): #Get a list of event objects that a given team has competed in
         if not year is None:
             event_list = self.__pull_team_events(team_key, year)
         else:
             event_list = self.__pull_all_team_events(team_key)
         return event_list
 
-    def get_team_event_awards(self, team_key, event_key):
+    def get_team_event_awards(self, team_key, event_key): #Get a list of all award objects that a team has won at a given event
         request = (self.baseURL + "/team/" + team_key + "/event/" + event_key + "/awards")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -277,7 +283,7 @@ class TBAParser:
 
         return award_list
 
-    def get_team_event_matches(self, team_key, event_key):
+    def get_team_event_matches(self, team_key, event_key): #Get a list of all match objects that a team competed in at a given event
         request = (self.baseURL + "/team/" + team_key + "/event/" + event_key + "/matches")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -308,7 +314,7 @@ class TBAParser:
 
         return media_list
 
-    def get_team_media(self, team_key, year = None):
+    def get_team_media(self, team_key, year = None): #Get a list of all media objects a team is responsible for
         if not year is None:
             media_list = self.__pull_team_media(team_key, year)
         else:
@@ -323,11 +329,11 @@ class TBAParser:
 
         return media_list
 
-    def get_team_history_events(self, team_key):
+    def get_team_history_events(self, team_key): #Returns a list of all event objects a team has attended
         events_list = self.__pull_all_team_events(team_key)
         return events_list
 
-    def get_team_history_awards(self, team_key):
+    def get_team_history_awards(self, team_key): #Returns a list of all award objects a team has won
         request = (self.baseURL + "/team/" + team_key + "/history/awards")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -339,7 +345,7 @@ class TBAParser:
 
         return award_list
 
-    def get_team_history_robots(self, team_key):
+    def get_team_history_robots(self, team_key): #Returns a list off all robot objects a team has made (seems to only work 2015 onwards)
         request = (self.baseURL + "/team/" + team_key + "/history/robots")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -349,17 +355,17 @@ class TBAParser:
         return robo_container_obj
 
     def get_team_history_districts(self, team_key):
-        request = (self.baseURL + "/team/" + team_key + "/history/robots")
+        request = (self.baseURL + "/team/" + team_key + "/history/districts")
         response = requests.get(request, headers = self.header)
         team_history_districts = response.json()
 
         return team_history_districts
 
-    def calc_team_key(self, number):
+    def calc_team_key(self, number): #Calculates a team's key given their team number
         key = "frc" + str(number)
         return key
 
-    def get_event_list(self, year):
+    def get_event_list(self, year): #Returns a list of all event objects for a given year
         request = (self.baseURL + "/events/" + str(year))
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -371,7 +377,7 @@ class TBAParser:
 
         return event_list
 
-    def get_event(self, event_key):
+    def get_event(self, event_key): #Returns a single event object given an event key
         request = (self.baseURL + "/event/" + event_key)
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -380,7 +386,7 @@ class TBAParser:
 
         return event_obj
 
-    def get_event_teams(self, event_key):
+    def get_event_teams(self, event_key): #Returns a list of all team objects that attended an event
         request = (self.baseURL + "/event/" + event_key + "/teams")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -393,7 +399,7 @@ class TBAParser:
 
         return team_list
 
-    def get_event_matches(self, event_key):
+    def get_event_matches(self, event_key): #Returns a list of all match objects in a given event
         request = (self.baseURL + "/event" + event_key + "/matches")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -424,7 +430,7 @@ class TBAParser:
 
         return event_rankings
 
-    def get_event_awards(self, event_key):
+    def get_event_awards(self, event_key): #Returns a list of all award objects given out at an event
         request = (self.baseURL + "/event/" + event_key + "/awards")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -437,7 +443,7 @@ class TBAParser:
 
         return award_list
 
-    #Finds event key from both year and event nickname.
+    #Calculates event key from both year and event nickname.
     #Name variable does not have to be complete, but it must be properly capitalized and specific enough to specify a single event
     #Returns "0" is no events are found, "1" if more than one event is found, and event key otherwise.
     #ALL RETURNS ARE STRINGS
@@ -460,7 +466,7 @@ class TBAParser:
             return '0'
         return curr[0][1]
 
-    def get_match(self, match_key):
+    def get_match(self, match_key): #Returns a single match object given the match key
         request = (self.baseURL + "/match/" + match_key)
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -482,7 +488,7 @@ class TBAParser:
             key = event_key + '_' + comp_level + 'm' + str(match_number)
         return key
 
-    def get_district_events(self, district_key, year):
+    def get_district_events(self, district_key, year): #Returns a list of event objects in a specific district
         request = (self.baseURL + "/district/" + district_key + "/" + str(year) + "/events")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -495,7 +501,7 @@ class TBAParser:
 
         return event_list
 
-    def get_district_teams(self, district_key, year):
+    def get_district_teams(self, district_key, year): #Returns a list of team objects in a specific district
         request = (self.baseURL + "/district/" + district_key + "/" + str(year) + "/teams")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -507,9 +513,3 @@ class TBAParser:
             team_list = team_list + [team_obj]
 
         return team_list
-
-#nardavin's code below this comment
-
-
-
-#like here
