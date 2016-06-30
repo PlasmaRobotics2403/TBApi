@@ -1,4 +1,5 @@
-#BLUE ALLIANCE API FOR PYTHON
+#TBApi - BLUE ALLIANCE API FOR PYTHON
+
 import os
 import sys
 import requests
@@ -46,31 +47,33 @@ class TBAEvent:
         self.start_date = raw_json['start_date']
         self.event_type = raw_json['event_type']
 
+#Class that defines the stats from a given event.  raw variable contains the raw json array that is returned by the blue alliance API.  Due to TBA not being consistant in what they return, not all values will be present with data on each call.
 class TBAEventStats:
     def __init__(self, raw_json):
         self.raw = raw_json
         try:
-            self.opr = TBAEventStatsObj(raw_json["oprs"])
+            self.opr = TBAEventStatsCategory(raw_json["oprs"]) #sets up a TBAEventStatsCategory for the OPR stat if it is passed back by TBA
         except:
             pass
         try:
-            self.ccwm = TBAEventStatsObj(raw_json["ccwms"])
+            self.ccwm = TBAEventStatsCategory(raw_json["ccwms"]) #sets up a TBAEventStatsCategory for the CCWM stat if it is passed back by TBA
         except:
             pass
         try:
-            self.dpr = TBAEventStatsObj(raw_json["dprs"])
+            self.dpr = TBAEventStatsCategory(raw_json["dprs"]) #sets up a TBAEventStatsCategory for the DPR stat if it is passed back by TBA
         except:
             pass
         try:
-            self.year_specific = raw_json['year_specific']
+            self.year_specific = raw_json['year_specific'] #sets up a TBAEventStatsCategory for the Year Specific Stats if it they are passed back by TBA
         except:
             pass
 
-class TBAEventStatsObj:
+#Class that defines the event stats under a given category (opr, ccwm, dpr, year_specific) with a method to get the stats under this category given a team_key or team_number
+class TBAEventStatsCategory:
     def __init__(self, raw_json):
         self.raw = raw_json
 
-    def get_team(self, team_number):
+    def get_team(self, team_number): #get the stats value for a given team
         if not isinstance(team_number, str):
             team_number = str(team_number)
         else:
@@ -84,6 +87,7 @@ class TBAEventStatsObj:
         team_stat = self.raw[team_number]
         return team_stat
 
+#Class that defines the rankings of a given event, and provides methods to get the TBAEventTeamRank objects for given teams or event ranks
 class TBAEventRankings:
     def __init__(self, raw_json):
         self.raw = raw_json
@@ -95,22 +99,22 @@ class TBAEventRankings:
         del raw_json[0]
 
         for key in raw_json:
-                team_dictionary = TBAEventTeamRank(self.keys, key)
+                team_dictionary = TBAEventTeamRank(self.keys, key) #creates a TBAEventTeamRank object for the given team as found in the rank dictionary passed back by TBA
 
                 team_rank = str(key[0])
                 team_number = str(key[1])
 
-                rank_dictionary[team_rank] = team_dictionary
-                team_rank_dictionary[team_number] = team_dictionary
+                rank_dictionary[team_rank] = team_dictionary #indexes the given object by event rank
+                team_rank_dictionary[team_number] = team_dictionary #indexes the given object by team number
 
         self.rankings = rank_dictionary
         self.team_rankings = team_rank_dictionary
 
-    def get_rank(self, rank):
+    def get_rank(self, rank): #gets the TBAEventTeamRank obj for a given event rank
         team_obj = self.rankings[str(rank)]
         return team_obj
 
-    def get_rank_by_team(self, team_number):
+    def get_rank_by_team(self, team_number): #gets the TBAEventTeamRank obj for a given team number
         if not isinstance(team_number, str):
             team_number = str(team_number)
         else:
@@ -125,6 +129,7 @@ class TBAEventRankings:
 
         return team_obj
 
+#Class that Creates a object with call attributes based on what is returned from TBA since it is not standardized
 class TBAEventTeamRank:
     def __init__(self, key_list, team_list):
         self.raw = team_list
@@ -137,6 +142,34 @@ class TBAEventTeamRank:
             key = key.lower().replace(" ", "_").replace("&","and").replace("/","_").replace("-","_")
             setattr(self, key, team_list[check_pos])
             check_pos += 1
+
+#Class that defines the District Points from a given event.  This is by event, but the event term has been removed from the class name to prevent issues that arise with long class names
+class TBADistrictPoints:
+    def __init__(self, raw_json):
+        self.raw = raw_json
+        self.points = raw_json['points']
+
+    def get_team(self, team_key):
+        if isinstance(team_key, str) and team_key.isdigit():
+            team_key = 'frc' + team_key
+        else:
+            team_key = 'frc' + str(team_key)
+
+        dist_points_json = self.points[team_key]
+
+        dist_points_obj = TBADistrictPointsTeam(dist_points_json)
+
+        return dist_points_obj
+
+#Class that defines the District points of a given team, created by get_team in TBADistrictPoints
+class TBADistrictPointsTeam:
+    def __init__(self, raw_json):
+        self.raw = raw_json
+        self.alliance_points = raw_json['alliance_points']
+        self.total = raw_json['total']
+        self.award_points = raw_json['award_points']
+        self.elim_points = raw_json['elim_points']
+        self.qual_points = raw_json['qual_points']
 
 #Class that defines an FRC match. Variables are automatically set when created. raw variable contains the raw json array that TBA returned
 class TBAMatch:
@@ -240,7 +273,7 @@ class TBAParser:
 
         return team_object
 
-    def __pull_team_events(self, team_key, year):
+    def __pull_team_events(self, team_key, year): #helper function to pull team events for use in get_team_events with a year passed in
         request = (self.baseURL + "/team/" + team_key + "/" + str(year) + "/events")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -252,7 +285,7 @@ class TBAParser:
 
         return event_list
 
-    def __pull_all_team_events(self, team_key):
+    def __pull_all_team_events(self, team_key): #helper function to pull team events for use in get_team_events without a year passed in
         request = (self.baseURL + "/team/" + team_key + "/history/events")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -295,14 +328,14 @@ class TBAParser:
 
         return match_list
 
-    def get_team_years_participated(self, team_key):
+    def get_team_years_participated(self, team_key): #Get a list of years participated
         request = (self.baseURL + "/team/" + team_key + "/years_participated")
         response = requests.get(request, headers = self.header)
         years_participated = response.json()
 
         return years_participated
 
-    def __pull_team_media(self, team_key, year):
+    def __pull_team_media(self, team_key, year): #pulls team media for use in get_team_media
         request = (self.baseURL + "/team/" + team_key + "/" + str(year) + "/media")
         response = requests.get(request, headers = self.header)
         json = response.json()
@@ -354,7 +387,7 @@ class TBAParser:
 
         return robo_container_obj
 
-    def get_team_history_districts(self, team_key):
+    def get_team_history_districts(self, team_key): #gets a list of districts a team has participated in by year
         request = (self.baseURL + "/team/" + team_key + "/history/districts")
         response = requests.get(request, headers = self.header)
         team_history_districts = response.json()
@@ -443,6 +476,15 @@ class TBAParser:
 
         return award_list
 
+    def get_event_district_points(self, event_key): #returns a TBADistrictPoints obj, capable of method chaining
+        request = (self.baseURL + "/event/" + event_key + "/district_points")
+        response = requests.get(request, headers = self.header)
+        json = response.json()
+
+        district_points_obj = TBADistrictPoints(json)
+
+        return district_points_obj
+
     #Calculates event key from both year and event nickname.
     #Name variable does not have to be complete, but it must be properly capitalized and specific enough to specify a single event
     #Returns "0" is no events are found, "1" if more than one event is found, and event key otherwise.
@@ -487,6 +529,13 @@ class TBAParser:
         else:
             key = event_key + '_' + comp_level + 'm' + str(match_number)
         return key
+
+    def get_district_list(self, year):
+        request = (self.baseURL + "/districts/" + str(year))
+        response = requests.get(request, headers = self.header)
+        district_list = response.json()
+
+        return district_list
 
     def get_district_events(self, district_key, year): #Returns a list of event objects in a specific district
         request = (self.baseURL + "/district/" + district_key + "/" + str(year) + "/events")
