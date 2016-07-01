@@ -177,7 +177,6 @@ class TBAMatch:
         self.raw = raw_json
         self.comp_level = raw_json['comp_level']
         self.match_number = raw_json['match_number']
-        self.number = raw_json['match_number']
         self.videos = raw_json['videos']
         self.time_string = raw_json['time_string']
         self.set_number = raw_json['set_number']
