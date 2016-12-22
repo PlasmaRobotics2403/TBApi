@@ -18,8 +18,10 @@ class TBATeam:
         self.country_name = raw_json['country_name']
         self.location = raw_json['location']
         self.team_number = raw_json['team_number']
+        self.number = raw_json['team_number']
         self.key = raw_json['key']
         self.nickname = raw_json['nickname']
+        self.nick = raw_json['nickname']
         self.rookie_year = raw_json['rookie_year']
         self.motto = raw_json['motto']
 
@@ -496,7 +498,7 @@ class TBAParser:
         events = np_array([[str(event['short_name']), str(event['key'])] for event in dictionary])
         ret = ''
         for sub in events[:, 0]:
-            if sub[:len(name)] == name:
+            if sub[:len(name)].lower() == name.lower():
                 if not ret == '':
                     print("Multiple events found. Please refine your search.")
                     return '1'
