@@ -434,7 +434,7 @@ class TBAParser:
         return team_list
 
     def get_event_matches(self, event_key): #Returns a list of all match objects in a given event
-        request = (self.baseURL + "/event" + event_key + "/matches")
+        request = (self.baseURL + "/event/" + event_key + "/matches")
         response = requests.get(request, headers = self.header)
         json = response.json()
 
