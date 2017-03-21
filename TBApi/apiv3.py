@@ -25,6 +25,7 @@ class DataList(list):
             if json_array['error'] is True:
                 self.is_error = True
 
+    # A method allowing for end-users to filter data-points by specific attributes, ex: team number.
     def filter(self, attr_name, attr_value):
         """Filter the stored objects by a given attribute.  Returns a new DataList."""
 
@@ -42,6 +43,7 @@ class DataList(list):
 
 # Basic Data Class:  Stores information about data returned by TBA
 class Data(object):
+    """Base Data Class:  Meant for extension by base data models."""
     def __init__(self, json_array):
         self.raw = json_array
 
@@ -50,6 +52,138 @@ class Data(object):
         if 'error' in json_array:
             if json_array['error'] is True:
                 self.is_error = True
+
+
+class Team(Data):
+    """Team Data Class:  Provides information regarding a given team."""
+
+    @property
+    def key(self):
+        """Team Key of the represented team"""
+        return self.raw['key']
+
+    @property
+    def team_number(self):
+        """Team Number of the represented team"""
+        return self.raw['team_number']
+
+    @property
+    def number(self):
+        """Team Number of the represented team"""
+        return self.raw['team_number']
+
+    @property
+    def nickname(self):
+        """Nickname of the represented team"""
+        return self.raw['nickname']
+
+    @property
+    def nick(self):
+        """Nickname of the represented team"""
+        return self.raw['nickname']
+
+    @property
+    def name(self):
+        """Full Name of the represented team"""
+        return self.raw['name']
+
+    @property
+    def rookie_year(self):
+        """Rookie Year of the represented team"""
+        return self.raw['rookie_year']
+
+    @property
+    def motto(self):
+        """Motto of the represented team"""
+        return self.raw['motto']
+
+    @property
+    def website(self):
+        """Website URL for the represented team"""
+        return self.raw['website']
+
+    @property
+    def address(self):
+        """Address of the represented team"""
+        return self.raw['address']
+
+    @property
+    def city(self):
+        """Home City of the represented team"""
+        return self.raw['city']
+
+    @property
+    def state(self):
+        """State or Province of the represented team"""
+        return self.raw['state_prov']
+
+    @property
+    def state_prov(self):
+        """State or Province of the represented team"""
+        return self.raw['state_prov']
+
+    @property
+    def province(self):
+        """State or Province of the represented team"""
+        return self.raw['state_prov']
+
+    @property
+    def country(self):
+        """Home Country of the represented team"""
+        return self.raw['country']
+
+    @property
+    def postal_code(self):
+        """Postal Code of the represented team"""
+        return self.raw['postal_code']
+
+    @property
+    def location_name(self):
+        """Name of the location of the represented team"""
+        return self.raw['location_name']
+
+    @property
+    def lat(self):
+        """Latitude of the represented team"""
+        return self.raw['lat']
+
+    @property
+    def latitude(self):
+        """Latitude of the represented team"""
+        return self.raw['lat']
+
+    @property
+    def lng(self):
+        """Longitude of the represented team"""
+        return self.raw['lng']
+
+    @property
+    def longitude(self):
+        """Longitude of the represented team"""
+        return self.raw['lng']
+
+    @property
+    def home_championship(self):
+        """Dictionary sorted by year containing the home championship of the represented team"""
+        return self.raw['home_championship']
+
+    @property
+    def gmaps_place_id(self):
+        """Place ID of the represented team as registered in Google Maps"""
+        return self.raw['gmaps_place_id']
+
+    @property
+    def gmaps_url(self):
+        """A URL representing the location of the represented team in Google Maps"""
+        return self.raw['gmaps_url']
+
+    def __str__(self):
+        """Return the Team Key when converted to a String."""
+        return self.key
+
+    def __int__(self):
+        """Return the Team Number when converted to an integer."""
+        return self.team_number
 
 
 # Cache Database Defaults Class: Used for setting up default columns in the cache database.
@@ -115,7 +249,7 @@ class Parser:
 
             if not cache_response is None: # If Database Response NOT blank:  AKA, if database value for given path not null
                 request = (self.base_url + path) # Full Request URL generation based on base_url as set in __init__
-                header = {'X-TBA-Auth-Key': self.api_key, 'If-Modified-Since': cache_last_modified_str} # Form headers, but substitute in last_modified string from database to see if data has changed since last database pull
+                header = {'X-TBA-Auth-Key': self.api_key, 'If-Modified-Since': cache_last_modified_str} # Form headers, but substitute in last_modified string from database to see if data has changed since last database pull.
 
                 if force_cache or self.force_cache:
                     if self.log_cache or log_cache:
