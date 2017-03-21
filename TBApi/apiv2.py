@@ -1,4 +1,4 @@
-#TBApi - BLUE ALLIANCE API FOR PYTHON
+#TBApi - THE BLUE ALLIANCE API v2 PYTHON LIBRARY
 
 import os
 import sys
@@ -237,7 +237,7 @@ class TBAParser:
 
     def __pull_team_list_by_page(self, page): #Helper function to make code for get_team_list simpler.
         request = (self.baseURL + "/teams/" + str(page))
-        response = requests.get(request, headers = self.header)
+        response = requests.get(request, headers=self.header)
         json_list = response.json()
         team_list = []
 
