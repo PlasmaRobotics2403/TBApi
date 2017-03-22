@@ -62,7 +62,7 @@ class DataList(list):
         for data_object in self:
             desired_attribute = getattr(data_object, str(attr_name), None)
 
-            if desired_attribute == attr_value:
+            if str(desired_attribute).lower() == str(attr_value).lower():
                 return_list.append(data_object)
                 return_list.raw.append(data_object.raw)
 
@@ -385,17 +385,16 @@ class Parser:
     ### CALL METHODS
 
     # Get a List of FRC Teams
-    def get_team_list(self, page=None, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of teams.  'Page' value optional."""
+    def get_team_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of teams.  'page' and 'year' values optional."""
         if not page is None:
-            team_list = self.__get_team_list_page(page, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+            return self.__get_team_list_page(page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
             team_list = DataList([], [])
 
             for prospective_page in range(0,100):
-
                 try:
-                    partial_list = self.__get_team_list_page(prospective_page, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+                    partial_list = self.__get_team_list_page(prospective_page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
                 except EmptyError:
                     break
 
@@ -405,9 +404,9 @@ class Parser:
         return team_list
 
     # HELPER: get single page of team data
-    def __get_team_list_page(self, page, *, force_new=False, force_cache=False, log_cache=False):
+    def __get_team_list_page(self, page, *, year=None, force_new=False, force_cache=False, log_cache=False):
         """HELPER METHOD: Get a single page of teams."""
-        return_array = self.pull_response_json('/teams/{}'.format(str(page)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return_array = self.pull_response_json('/teams/{}{}'.format('{}/'.format(year) if not year is None else '', str(page)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
 
         page_list = DataList([], return_array)
 
@@ -416,6 +415,29 @@ class Parser:
             page_list.append(team_obj)
 
         return page_list
+
+    # Get a List of FRC Team Keys
+    def get_team_key_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of team keys.  'page' and 'year' values optional."""
+        if not page is None:
+            return self.__get_team_list_page(page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        else:
+            key_list = []
+
+            for prospective_page in range(0,100):
+                try:
+                    partial_list = self.__get_team_key_list_page(prospective_page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+                except EmptyError:
+                    break
+
+                key_list += partial_list
+
+        return key_list
+
+    def __get_team_key_list_page(self, page, *, year=None, force_new=False, force_cache=False, log_cache=False):
+        """HELPER METHOD: Get a single page of team keys."""
+        return self.pull_response_json('/teams/{}{}/keys'.format('{}/'.format(year) if not year is None else '', str(page)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+
 
     # HELPER: convert team_number or team_key input to uniform team_key
     def __get_team_key(self, team_identifier):
