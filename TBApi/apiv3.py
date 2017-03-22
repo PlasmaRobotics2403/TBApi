@@ -425,8 +425,8 @@ class Parser:
         else:
             try:
                 int(team_identifier)
-            except:
-                return 'frc00000'
+            except ValueError:
+                raise KeyInputError
 
             return 'frc' + str(team_identifier)
 
