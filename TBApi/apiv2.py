@@ -249,7 +249,7 @@ class TBAParser:
 
     def get_team_list(self, page = None): #get list of FRC teams' TBATeam objects, either the entire list, or by page #
         if not page is None:
-            team_list = self.__pull_team_list_by_page
+            team_list = self.__pull_team_list_by_page(page)
         else:
             team_list = []
 
