@@ -68,16 +68,35 @@ class DataList(list):
 
         return return_list
 
+    # Customize Object Description Output to identify the given list as a DataList
+    def __repr__(self):
+        """Return a customized object description identifying the list as a DataList."""
+        list_return = super().__repr__()
+        return '<tbapi:DataList> {}'.format(list_return)
+
+    # A method to return the standard Object Description Output if needed by the user
+    @property
+    def list_representation(self):
+        """Return a JSON-like representation of the data in the list."""
+        return super().__repr__()
+
 
 # Basic Data Class:  Stores information about data returned by TBA by the parser.
 class Data(object):
     """Base Data Class:  Meant for extension by base data models."""
-    def __init__(self, json_array):
+    def __init__(self, json_array, identifier='Generic Data Object'):
         self.raw = json_array
+        self.identifier = identifier
+
+    # When referenced in terminal without called attribute, identify as a Data object
+    def __repr__(self):
+        """Return the Team Key Nickname as the Object Description"""
+        return '<tbapi.Data: {}>'.format(self.identifier)
+
 
 # Team Data Class: Provides team information returned by TBA by the parser.
 class Team(Data):
-    """Team Data Class:  Provides information regarding a given team."""
+    """Team Data Class: Provides information regarding a given team."""
 
     @property
     def key(self):
@@ -201,10 +220,10 @@ class Team(Data):
 
     # When referenced in terminal without called attribute, output team_number & nick (readability)
     def __repr__(self):
-        """Return the Team Key and Team Name as an object description"""
+        """Return the Team Key Nickname as the Object Description"""
         return '<tbapi.Team: {} - {}>'.format(self.team_number, self.nickname)
 
-    # When converted to a string, return the team_key
+    # When converted to a string, return the team key
     def __str__(self):
         """Return the Team Key when converted to a String."""
         return self.key
@@ -213,6 +232,46 @@ class Team(Data):
     def __int__(self):
         """Return the Team Number when converted to an integer."""
         return int(self.team_number) # Convert to an integer, in case of errors in JSON parsing.
+
+
+# District Data Class: Provides information about a given district.
+class District(Data):
+    """District Data Class: Provides information regarding a given district."""
+
+    @property
+    def key(self):
+        """The key of the represented district."""
+        return self.raw['key']
+
+    @property
+    def year(self):
+        """The year of operation of the represented district."""
+        return self.raw['year']
+
+    @property
+    def display_name(self):
+        """A string representing a human readable name for the represented district."""
+        return self.raw['display_name']
+
+    @property
+    def abbreviation(self):
+        """A string representing a simple abbreviation of the represented district's name."""
+        return self.raw['abbreviation']
+
+    # When referenced in terminal without called attribute, output display_name, year, and key (readability)
+    def __repr__(self):
+        """Return the Team Key and Team Name as the Object Description"""
+        return '<tbapi.District: {} {} District ({})>'.format(self.year, self.display_name, self.key)
+
+    # When converted to a string, return the district key
+    def __str__(self):
+        """Return the District Key when converted to a String."""
+        return self.key
+
+    # When converted to an integer, return the district year
+    def __int__(self):
+        """Return the district year when converted to an Integer."""
+        return int(self.year) # Convert to an integer, in case of errors in JSON parsing.
 
 
 # Cache Database Defaults Class: Used for setting up default columns in the cache database.
@@ -383,7 +442,6 @@ class Parser:
 
 
     ### CALL METHODS
-
     # Get a List of FRC Teams
     def get_team_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
         """Get a list of teams.  'page' and 'year' values optional."""
@@ -454,5 +512,16 @@ class Parser:
 
     # Get information about a single FRC Team by team number or team key
     def get_team(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a single team, by 'team_key' or 'team_number'"""
+        """Get a single team, by 'team_key' or 'team_number'."""
         return Team(self.pull_response_json('/team/{}'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache))
+
+    # Get a list containing the years in which a given team has participated
+    def get_team_years_participated(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list containing the years in which a given team has participated."""
+        return self.pull_response_json('/team/{}/years_participated'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+    
+    # Get a list of Districts that the given team has competed in
+    def get_team_districts(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of districts in which the given team has competed in."""
+        district_list = self.pull_response_json('/team/{}/districts'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([District(district_item) for district_item in district_list], district_list)
