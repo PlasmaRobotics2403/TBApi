@@ -258,9 +258,9 @@ class District(Data):
         """A string representing a simple abbreviation of the represented district's name."""
         return self.raw['abbreviation']
 
-    # When referenced in terminal without called attribute, output display_name, year, and key (readability)
+    # When referenced in terminal without called attribute, output display_name, year, and key (readability).
     def __repr__(self):
-        """Return the Team Key and Team Name as the Object Description"""
+        """Return the Team Key and Team Name as the Object Description."""
         return '<tbapi.District: {} {} District ({})>'.format(self.year, self.display_name, self.key)
 
     # When converted to a string, return the district key
@@ -271,6 +271,61 @@ class District(Data):
     # When converted to an integer, return the district year
     def __int__(self):
         """Return the district year when converted to an Integer."""
+        return int(self.year) # Convert to an integer, in case of errors in JSON parsing.
+
+
+# Robot Data Class: Provides information about an individual robot beloging to a team in a given year.
+class Robot(Data):
+    """Robot Data Class: Provides information about a robot belonging to a team in a given year."""
+
+    @property
+    def key(self):
+        """The key of the represented robot."""
+        return self.raw['key']
+
+    @property
+    def robot_name(self):
+        """The name of the represented robot."""
+        return self.raw['robot_name']
+
+    @property
+    def name(self):
+        """The name of the represented robot."""
+        return self.raw['robot_name']
+
+    @property
+    def team_key(self):
+        """The team_key of the team that owns the represented robot."""
+        return self.raw['team_key']
+
+    @property
+    def team(self):
+        """The team_key of the team that owns the represented robot."""
+        return self.raw['team_key']
+
+    @property
+    def team_number(self):
+        """The team_number of the team that owns the represented robot."""
+        return self.raw['team_key'][3:]
+
+    @property
+    def year(self):
+        """The year in which the represented robot was built and competed."""
+        return self.raw['year']
+
+    # When referenced in terminal without called attribute, output robot_name and key (readability).
+    def __repr__(self):
+        """Return the Robot Name and Key when referenced."""
+        return '<tbapi.Robot: {} ({})>'.format(self.robot_name, self.key)
+
+    # When converted to a string, return the robot's key.
+    def __str__(self):
+        """Return the Robot Key when converted to a String."""
+        return self.key
+
+    # When converted to an integer, return the year in which the robot was built.
+    def __int__(self):
+        """Return the robot build year when converted to an Integer."""
         return int(self.year) # Convert to an integer, in case of errors in JSON parsing.
 
 
@@ -491,7 +546,8 @@ class Parser:
                 key_list += partial_list
 
         return key_list
-
+    
+    # HELPER: get single page of team keys
     def __get_team_key_list_page(self, page, *, year=None, force_new=False, force_cache=False, log_cache=False):
         """HELPER METHOD: Get a single page of team keys."""
         return self.pull_response_json('/teams/{}{}/keys'.format('{}/'.format(year) if not year is None else '', str(page)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
@@ -525,3 +581,9 @@ class Parser:
         """Get a list of districts in which the given team has competed in."""
         district_list = self.pull_response_json('/team/{}/districts'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([District(district_item) for district_item in district_list], district_list)
+
+    # Get a list of Robots built and operated by a given team
+    def get_team_robots(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of robots built and operated by a given team."""
+        robot_list = self.pull_response_json('/team/{}/robots'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Robot(robot_item) for robot_item in robot_list], robot_list)
