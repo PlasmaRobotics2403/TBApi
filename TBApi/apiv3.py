@@ -60,9 +60,9 @@ class DataList(list):
         return_list = self.__class__([], [])
 
         for data_object in self:
-            desired_attribute = getattr(data_object, str(attr_name), None)
+            actual_attribute = getattr(data_object, str(attr_name), None)
 
-            if str(desired_attribute).lower() == str(attr_value).lower():
+            if str(attr_value).lower() in str(actual_attribute).lower():
                 return_list.append(data_object)
                 return_list.raw.append(data_object.raw)
 
@@ -72,7 +72,7 @@ class DataList(list):
     def __repr__(self):
         """Return a customized object description identifying the list as a DataList."""
         list_return = super().__repr__()
-        return '<tbapi:DataList> {}'.format(list_return)
+        return '<tbapi.DataList> {}'.format(list_return)
 
     # A method to return the standard Object Description Output if needed by the user
     @property
@@ -82,10 +82,10 @@ class DataList(list):
 
 
 # Basic Data Class:  Stores information about data returned by TBA by the parser.
-class Data(object):
+class Data(dict):
     """Base Data Class:  Meant for extension by base data models."""
     def __init__(self, json_array, identifier='Generic Data Object'):
-        self.raw = json_array
+        self.update(json_array)
         self.identifier = identifier
 
     # When referenced in terminal without called attribute, identify as a Data object
@@ -101,122 +101,122 @@ class Team(Data):
     @property
     def key(self):
         """Team Key of the represented team"""
-        return self.raw['key']
+        return self['key']
 
     @property
     def team_number(self):
         """Team Number of the represented team"""
-        return self.raw['team_number']
+        return self['team_number']
 
     @property
     def number(self):
         """Team Number of the represented team"""
-        return self.raw['team_number']
+        return self['team_number']
 
     @property
     def nickname(self):
         """Nickname of the represented team"""
-        return self.raw['nickname']
+        return self['nickname']
 
     @property
     def nick(self):
         """Nickname of the represented team"""
-        return self.raw['nickname']
+        return self['nickname']
 
     @property
     def name(self):
         """Full Name of the represented team"""
-        return self.raw['name']
+        return self['name']
 
     @property
     def rookie_year(self):
         """Rookie Year of the represented team"""
-        return self.raw['rookie_year']
+        return self['rookie_year']
 
     @property
     def motto(self):
         """Motto of the represented team"""
-        return self.raw['motto']
+        return self['motto']
 
     @property
     def website(self):
         """Website URL for the represented team"""
-        return self.raw['website']
+        return self['website']
 
     @property
     def address(self):
         """Address of the represented team"""
-        return self.raw['address']
+        return self['address']
 
     @property
     def city(self):
         """Home City of the represented team"""
-        return self.raw['city']
+        return self['city']
 
     @property
     def state(self):
         """State or Province of the represented team"""
-        return self.raw['state_prov']
+        return self['state_prov']
 
     @property
     def state_prov(self):
         """State or Province of the represented team"""
-        return self.raw['state_prov']
+        return self['state_prov']
 
     @property
     def province(self):
         """State or Province of the represented team"""
-        return self.raw['state_prov']
+        return self['state_prov']
 
     @property
     def country(self):
         """Home Country of the represented team"""
-        return self.raw['country']
+        return self['country']
 
     @property
     def postal_code(self):
         """Postal Code of the represented team"""
-        return self.raw['postal_code']
+        return self['postal_code']
 
     @property
     def location_name(self):
         """Name of the location of the represented team"""
-        return self.raw['location_name']
+        return self['location_name']
 
     @property
     def lat(self):
         """Latitude of the represented team"""
-        return self.raw['lat']
+        return self['lat']
 
     @property
     def latitude(self):
         """Latitude of the represented team"""
-        return self.raw['lat']
+        return self['lat']
 
     @property
     def lng(self):
         """Longitude of the represented team"""
-        return self.raw['lng']
+        return self['lng']
 
     @property
     def longitude(self):
         """Longitude of the represented team"""
-        return self.raw['lng']
+        return self['lng']
 
     @property
     def home_championship(self):
         """Dictionary sorted by year containing the home championship of the represented team"""
-        return self.raw['home_championship']
+        return self['home_championship']
 
     @property
     def gmaps_place_id(self):
         """Place ID of the represented team as registered in Google Maps"""
-        return self.raw['gmaps_place_id']
+        return self['gmaps_place_id']
 
     @property
     def gmaps_url(self):
         """A URL representing the location of the represented team in Google Maps"""
-        return self.raw['gmaps_url']
+        return self['gmaps_url']
 
     # When referenced in terminal without called attribute, output team_number & nick (readability)
     def __repr__(self):
@@ -241,22 +241,22 @@ class District(Data):
     @property
     def key(self):
         """The key of the represented district."""
-        return self.raw['key']
+        return self['key']
 
     @property
     def year(self):
         """The year of operation of the represented district."""
-        return self.raw['year']
+        return self['year']
 
     @property
     def display_name(self):
         """A string representing a human readable name for the represented district."""
-        return self.raw['display_name']
+        return self['display_name']
 
     @property
     def abbreviation(self):
         """A string representing a simple abbreviation of the represented district's name."""
-        return self.raw['abbreviation']
+        return self['abbreviation']
 
     # When referenced in terminal without called attribute, output display_name, year, and key (readability).
     def __repr__(self):
@@ -281,37 +281,37 @@ class Robot(Data):
     @property
     def key(self):
         """The key of the represented robot."""
-        return self.raw['key']
+        return self['key']
 
     @property
     def robot_name(self):
         """The name of the represented robot."""
-        return self.raw['robot_name']
+        return self['robot_name']
 
     @property
     def name(self):
         """The name of the represented robot."""
-        return self.raw['robot_name']
+        return self['robot_name']
 
     @property
     def team_key(self):
         """The team_key of the team that owns the represented robot."""
-        return self.raw['team_key']
+        return self['team_key']
 
     @property
     def team(self):
         """The team_key of the team that owns the represented robot."""
-        return self.raw['team_key']
+        return self['team_key']
 
     @property
     def team_number(self):
         """The team_number of the team that owns the represented robot."""
-        return self.raw['team_key'][3:]
+        return self['team_key'][3:]
 
     @property
     def year(self):
         """The year in which the represented robot was built and competed."""
-        return self.raw['year']
+        return self['year']
 
     # When referenced in terminal without called attribute, output robot_name and key (readability).
     def __repr__(self):
@@ -329,6 +329,349 @@ class Robot(Data):
         return int(self.year) # Convert to an integer, in case of errors in JSON parsing.
 
 
+# Social Media Data Class: Represents a team's presense on a social media platform.
+class Social(Data):
+    """Social Media Data Class: Represents a team's presense on a social media platform."""
+
+    @property
+    def details(self):
+        """Details about the represented Social Media Presense."""
+        return self['details']
+
+    @property
+    def foreign_key(self):
+        """Foreign Key for the represented Social Media Presense."""
+        return self['foreign_key']
+
+    @property
+    def key(self):
+        """Foreign Key for the represented Social Media Presense."""
+        return self['foreign_key']
+
+    @property
+    def preferred(self):
+        """Whether or not the given Social Media Presense is preferred by it's team."""
+        return self['preferred']
+
+    @property
+    def type(self):
+        """The type of Social Media Presense represented."""
+        return self['type']
+
+    # When referenced in terminal without called attribute, output Robot Name and Key.
+    def __repr__(self):
+        """Return the Robot Name and Key when referenced."""
+        return '<tbapi.Social: {}>'.format(self.type)
+
+
+# Event Data Class: Represents a given event and it's corresponding data.
+class Event(Data):
+    """Event Data Class:  Represents a given Event and it's corresponding data."""
+
+    @property
+    def key(self):
+        """The key for the represented event."""
+        return self['key']
+
+    @property
+    def event_code(self):
+        """The event code for the represented event."""
+        return self['event_code']
+
+    @property
+    def code(self):
+        """The event code for the represented event."""
+        return self['event_code']
+
+    @property
+    def year(self):
+        """The year in which the represented event takes place."""
+        return self['year']
+
+    @property
+    def week(self):
+        """The event week in which the represented event takes place."""
+        return self['week']
+
+    @property
+    def name(self):
+        """The name of the represented event."""
+        return self['name']
+
+    @property
+    def short_name(self):
+        """The short name of the represented event."""
+        return self['short_name']
+
+    @property
+    def event_type(self):
+        """The type of the represented event."""
+        return self['event_type']
+
+    @property
+    def event_type_string(self):
+        """A string representing the type of the represented event."""
+        return self['event_type_string']
+
+    @property
+    def start_date(self):
+        """The starting date of the represented event."""
+        return self['start_date']
+
+    @property
+    def start(self):
+        """The starting date of the represented event."""
+        return self['start_date']
+
+    @property
+    def end_date(self):
+        """The ending date of the represented event."""
+        return self['end_date']
+
+    @property
+    def end(self):
+        """The ending date of the represented event."""
+        return self['end_date']
+
+    @property
+    def webcasts(self):
+        """A list of Webcast Objects for the represented event."""
+        modified_return = self['webcasts']
+        modified_return['event'] = '{} ({})'.format(self.name, self.key)
+        return DataList([Webcast(webcast_item) for webcast_item in modified_return], self['webcasts'])
+
+    @property
+    def website(self):
+        """The Website for the represented event."""
+        return self['website']
+
+    @property
+    def district(self):
+        """The District in which the represented event takes place, if available."""
+        return self['district']
+
+    @property
+    def location_name(self):
+        """The name of the location at which the represented event takes place."""
+        return self['location_name']
+
+    @property
+    def lat(self):
+        """A float representing the latitude of the represented event's venue."""
+        return self['lat']
+
+    @property
+    def latitude(self):
+        """A float representing the latitude of the represented event's venue."""
+        return self['lat']
+
+    @property
+    def lng(self):
+        """A float representing the latitude of the represented event's venue."""
+        return self['lng']
+
+    @property
+    def longitude(self):
+        """A float representing the longitude of the represented event's venue."""
+        return self['lng']
+
+    @property
+    def address(self):
+        """The address of the venue of the represented event."""
+        return self['address']
+
+    @property
+    def city(self):
+        """The city of the venue of the represented event."""
+        return self['city']
+
+    @property
+    def state_prov(self):
+        """The state or province of the venue of the represented event."""
+        return self['state_prov']
+
+    @property
+    def state(self):
+        """The state or province of the venue of the represented event."""
+        return self['state_prov']
+
+    @property
+    def province(self):
+        """The state or province of the venue of the represented event."""
+        return self['state_prov']
+
+    @property
+    def country(self):
+        """The country of the venue of the represented event."""
+        return self['country']
+
+    @property
+    def postal_code(self):
+        """The postal code of the venue of the represented event."""
+        return self['postal_code']
+
+    @property
+    def timezone(self):
+        """The timezone of the venue of the represented event."""
+        return self['timezone']
+
+    @property
+    def gmaps_place_id(self):
+        """The google maps place id of the venue of the represented event."""
+        return self['gmaps_place_id']
+
+    @property
+    def gmaps_url(self):
+        """The google maps url of the venue of the represented event."""
+        return self['gmaps_url']
+
+    @property
+    def first_event_id(self):
+        """I have no idea what this does."""
+        return self['first_event_id']
+
+    # When referenced in terminal without called attribute, output event name and key.
+    def __repr__(self):
+        """Return the Event Name and Key when referenced."""
+        return '<tbapi.Event: {} ({})>'.format(self.name, self.key)
+
+
+# Webcast Data Class: Represents a webcast for a given event and its corresponding data.
+class Webcast(Data):
+    """Webcast Data Class: Represents a webcast for a given event and its corresponding data."""
+
+    @property
+    def channel(self):
+        """The Channel of the represented Webcast."""
+        if 'channel' in self:
+            return self['channel']
+        else:
+            return None
+
+    @property
+    def type(self):
+        """The Type of the represented Webcast."""
+        if 'type' in self:
+            return self['type']
+        else:
+            return None
+
+    @property
+    def date(self):
+        """The Date of the represented Webcast."""
+        if 'date' in self:
+            return self['date']
+        else:
+            return None
+
+    @property
+    def file(self):
+        """The File of the represented Webcast."""
+        if 'file' in self:
+            return self['file']
+        else:
+            return None
+
+    # When referenced in terminal without called attribute, output event information.
+    def __repr__(self):
+        """Return event information when referenced."""
+        return '<tbapi.Webcast: Webcast for {}>'.format(self['event'])
+
+
+# Video Data Class: Represents a video as posted on The Blue Alliance.
+class Video(Data):
+    """Video Data Class: Represents a video as posted on The Blue Alliance."""
+
+    @property
+    def key(self):
+        """The key of the represented video."""
+        return self['key']
+
+    @property
+    def type(self):
+        """The type of represented video."""
+        return self['type']
+
+# Webcast Data Class: Represents a webcast for a given event and its corresponding data.
+class Match(Data):
+    """Match Data Class: Represents a match at a given event and its corresponding data."""
+
+    @property
+    def key(self):
+        """The Match Key for the given match.  Includes event_key as a Substring."""
+        return self['key']
+
+    @property
+    def event_key(self):
+        """The Event Key of the Event at which the given match was played."""
+        return self['event_key']
+
+    @property
+    def comp_level(self):
+        """The Competition Level at which the given Match was played. (qm, qf, sf, f, etc.)"""
+        return self['comp_level']
+
+    @property
+    def level(self):
+        """The Competition Level at which the given Match was played. (qm, qf, sf, f, etc.)"""
+        return self['comp_level']
+
+    @property
+    def match_number(self):
+        """The ID number of the given Match"""
+        return self['match_number']
+
+    @property
+    def number(self):
+        """The ID number of the given Match"""
+        return self['match_number']
+
+    @property
+    def set_number(self):
+        """The ID number of the given Match in the current Match set."""
+        return self['set_number']
+
+    @property
+    def raw_time(self):
+        """A Unix-Time representation of the Match Time."""
+        return self['time']
+
+    @property
+    def time(self):
+        """A Datetime representation of the Match Time."""
+        return datetime.datetime.fromtimestamp(int(self['time']))
+
+    @property
+    def raw_predicted_time(self):
+        """A Unix-Time representation of the Scheduled Match Time."""
+        return self['predicted_time']
+
+    @property
+    def predicted_time(self):
+        """A Datetime representation of the Scheduled Match Time."""
+        return datetime.datetime.fromtimestamp(int(self['predicted_time']))
+
+    @property
+    def raw_post_time(self):
+        """A Unix-Time representation of the Score Post Time."""
+        return self['post_result_time']
+
+    @property
+    def raw_post_result_time(self):
+        """A Unix-Time representation of the Score Post Time."""
+        return self['post_result_time']
+
+    @property
+    def post_time(self):
+        """A Datetime representation of the Score Post Time."""
+        return datetime.datetime.fromtimestamp(int(self['post_result_time']))
+
+    @property
+    def post_result_time(self):
+        """A Datetime representation of the Score Post Time."""
+        return datetime.datetime.fromtimestamp(int(self['post_result_time']))
+
+
 # Cache Database Defaults Class: Used for setting up default columns in the cache database.
 class CacheTable(object):
     """Database Cache Defaults:  Holds default cache table column information."""
@@ -340,14 +683,15 @@ class CacheTable(object):
 
 # Main Parser Class:  All requests routed through this class's methods.
 class Parser:
-    """TBA Parser Class:  Routes API requests and handles caching. Requires v3 API Key from TBA."""
+    """TBA Parser Class: Routes API requests and handles caching. Requires v3 API Key from TBA."""
 
     # Initiate Information needed for connection to TBA v3 (api_key)
-    def __init__(self, api_key, *, cache=True, force_cache=False, log_cache=False):
-        self.api_key = api_key # TBA API v3 API key 
+    def __init__(self, api_key, *, cache=True, force_cache=False, log_cache=False, cache_multiplier=1):
+        self.api_key = api_key # TBA API v3 API key
         self.cache = cache
         self.force_cache = force_cache
         self.log_cache = log_cache
+        self.cache_multiplier = cache_multiplier
         self.base_url = 'http://www.thebluealliance.com/api/v3'
 
         if self.cache:
@@ -368,6 +712,9 @@ class Parser:
     # Method to pull JSON array from TBA v3 API.  Includes Caching and Offline Support.
     def pull_response_json(self, path, *, force_new=False, force_cache=False, log_cache=False):
         """Pull the JSON response to a given path from the TBA API servers or the response cache."""
+        
+        if not path.startswith('/'):
+            path = '/' + path
 
         current_time = datetime.datetime.now() # Get the Current Time at the start of method execution
 
@@ -406,7 +753,8 @@ class Parser:
                 try:
                     response = requests.get(request, headers=header)
                 except:
-                    cache_expire = cache_requested + datetime.timedelta(seconds=int(cache_max_age))
+                    cache_expire_offset = float(cache_max_age) * float(self.cache_multiplier)
+                    cache_expire = cache_requested + datetime.timedelta(seconds=int(cache_expire_offset))
 
                     if current_time <= cache_expire:
                         if self.log_cache or log_cache:
@@ -587,3 +935,24 @@ class Parser:
         """Get a list of robots built and operated by a given team."""
         robot_list = self.pull_response_json('/team/{}/robots'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Robot(robot_item) for robot_item in robot_list], robot_list)
+
+    # Get a list of Social Media Presences operated by a given team.
+    def get_team_social_media(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of Social Media Presences operated by a given team."""
+        social_list = self.pull_response_json('/team/{}/social_media'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Social(social_item) for social_item in social_list], social_list)
+
+    # ALIAS: get_team_social_media
+    def get_team_social(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of Social Media Presences operated by a given team."""
+        return self.get_team_social_media(team_identifier, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+
+    # Get a list of events attended by a given team
+    def get_team_events(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
+        """Get a list of Events attended by a given team"""
+        if not year:
+            event_list = self.pull_response_json('/team/{}/events'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+            return DataList([Event(event_item) for event_item in event_list], event_list)
+        else:
+            event_list = self.pull_response_json('/team/{}/events/{}'.format(self.__get_team_key(team_identifier), str(year)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+            return DataList([Event(event_item) for event_item in event_list], event_list)
