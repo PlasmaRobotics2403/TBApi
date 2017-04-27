@@ -1,0 +1,847 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TBApi - A Python Wrapper for The Blue Alliance API v3 &#8212; TBApi 1.3.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tbapi-a-python-wrapper-for-the-blue-alliance-api-v3">
+<h1>TBApi - A Python Wrapper for The Blue Alliance API v3<a class="headerlink" href="#tbapi-a-python-wrapper-for-the-blue-alliance-api-v3" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Python3+ is required for usage with TBApi.  To install Python3+ and PIP for your system, visit <a class="reference external" href="https://www.python.org/downloads/">the Python Website</a>.</p>
+<p>Once Python is installed, the library can be installed or updated by running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">tbapi</span>
+</pre></div>
+</div>
+<p>The library can then be easily imported and used within your projects.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>The TBApi Library can be imported simply by calling:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tbapi</span>
+</pre></div>
+</div>
+<p>From there, you must create a <a class="reference internal" href="#tbapi.Parser" title="tbapi.Parser"><code class="xref py py-class docutils literal"><span class="pre">Parser</span></code></a> object that allows you to interact with The Blue Alliance&#8217;s API servers.  You can generate an API key by visiting <a class="reference external" href="https://www.thebluealliance.com/account">TBA Account Settings</a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">tbapi</span><span class="o">.</span><span class="n">Parser</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This <a class="reference internal" href="#tbapi.Parser" title="tbapi.Parser"><code class="xref py py-class docutils literal"><span class="pre">Parser</span></code></a> object can then be used to gather data from The Blue Alliance API.  <a class="reference internal" href="#tbapi.Parser" title="tbapi.Parser"><code class="xref py py-class docutils literal"><span class="pre">Parser</span></code></a> methods are available for every API call and can be found below.</p>
+</div>
+<div class="section" id="parser">
+<h2>Parser<a class="headerlink" href="#parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tbapi.Parser">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Parser</code><span class="sig-paren">(</span><em>api_key</em>, <em>*</em>, <em>cache=True</em>, <em>force_cache=False</em>, <em>log_cache=False</em>, <em>cache_multiplier=1</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>TBA Parser Class: Routes API requests and handles caching. Requires v3 API Key from TBA.</p>
+<dl class="method">
+<dt id="tbapi.Parser.get_status">
+<code class="descname">get_status</code><span class="sig-paren">(</span><em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_status" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.Status" title="tbapi.Status"><code class="xref py py-class docutils literal"><span class="pre">Status</span></code></a>: the Status of The Blue Alliance&#8217;s API and its Apps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team">
+<code class="descname">get_team</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.Team" title="tbapi.Team"><code class="xref py py-class docutils literal"><span class="pre">Team</span></code></a>: Get a single team, by &#8216;team_key&#8217; or &#8216;team_number&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_awards">
+<code class="descname">get_team_awards</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>year=None</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_awards" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <code class="xref py py-class docutils literal"><span class="pre">Award</span></code> objects presented to a given Team throughout their History.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_districts">
+<code class="descname">get_team_districts</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_districts" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <a class="reference internal" href="#tbapi.District" title="tbapi.District"><code class="xref py py-class docutils literal"><span class="pre">District</span></code></a> objects in which the given team has competed in.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_event_awards">
+<code class="descname">get_team_event_awards</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>event_key</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_event_awards" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <code class="xref py py-class docutils literal"><span class="pre">Award</span></code> objects presented to a given Team at a given Event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_event_matches">
+<code class="descname">get_team_event_matches</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>event_key</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_event_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <code class="xref py py-class docutils literal"><span class="pre">Match</span></code> objects played by a given Team at a given Event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_event_status">
+<code class="descname">get_team_event_status</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>event_key</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_event_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the status of a given team at a given event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_events">
+<code class="descname">get_team_events</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>year=None</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_events" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <a class="reference internal" href="#tbapi.Event" title="tbapi.Event"><code class="xref py py-class docutils literal"><span class="pre">Event</span></code></a> objects attended by a given team.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_key_list">
+<code class="descname">get_team_key_list</code><span class="sig-paren">(</span><em>*</em>, <em>page=None</em>, <em>year=None</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_key_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of team keys.  &#8216;page&#8217; and &#8216;year&#8217; values optional.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_list">
+<code class="descname">get_team_list</code><span class="sig-paren">(</span><em>*</em>, <em>page=None</em>, <em>year=None</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_list" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <a class="reference internal" href="#tbapi.Team" title="tbapi.Team"><code class="xref py py-class docutils literal"><span class="pre">Team</span></code></a> objects.  &#8216;page&#8217; and &#8216;year&#8217; values optional.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_matches">
+<code class="descname">get_team_matches</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>year=None</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <code class="xref py py-class docutils literal"><span class="pre">Match</span></code> objects played by a given Team throughout their History</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_robots">
+<code class="descname">get_team_robots</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_robots" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <a class="reference internal" href="#tbapi.Robot" title="tbapi.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a> objects built and operated by a given team.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_social_media">
+<code class="descname">get_team_social_media</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_social_media" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: a list of <a class="reference internal" href="#tbapi.Social" title="tbapi.Social"><code class="xref py py-class docutils literal"><span class="pre">Social</span></code></a> objects (Social Media Prescenses) operated by a given team.</p>
+<p>Alias: <em>get_team_social</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.get_team_years_participated">
+<code class="descname">get_team_years_participated</code><span class="sig-paren">(</span><em>team_identifier</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.get_team_years_participated" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code>: a list containing the years in which a given team has participated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tbapi.Parser.pull_response_json">
+<code class="descname">pull_response_json</code><span class="sig-paren">(</span><em>path</em>, <em>*</em>, <em>force_new=False</em>, <em>force_cache=False</em>, <em>log_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Parser.pull_response_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull the JSON response to a given path from the TBA API servers or the response cache.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="data-classes">
+<h2>Data Classes<a class="headerlink" href="#data-classes" title="Permalink to this headline">¶</a></h2>
+<p>Individual Data Classes that represent certain types of data.</p>
+<div class="section" id="data-list">
+<h3>Data List<a class="headerlink" href="#data-list" title="Permalink to this headline">¶</a></h3>
+<p>A modified List including filter support and access to the raw JSON arrays represented.</p>
+<dl class="class">
+<dt id="tbapi.DataList">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">DataList</code><span class="sig-paren">(</span><em>data_list</em>, <em>json_array</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.DataList" title="Permalink to this definition">¶</a></dt>
+<dd><p>List-Extension used for storing data objects with extra information.</p>
+<dl class="method">
+<dt id="tbapi.DataList.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>attr_name</em>, <em>attr_value</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.DataList.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the stored objects by a given attribute with a given value.</p>
+<p>Returns new DataList containing only Data Objects with attribute <code class="docutils literal"><span class="pre">attr_name</span></code> containing <code class="docutils literal"><span class="pre">attr_value</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.DataList.raw">
+<code class="descname">raw</code><a class="headerlink" href="#tbapi.DataList.raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the raw JSON array used to create the <a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a> object and it&#8217;s contained <a class="reference internal" href="#tbapi.Data" title="tbapi.Data"><code class="xref py py-class docutils literal"><span class="pre">Data</span></code></a> objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="data">
+<h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Data">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Data</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic Data Class, extended with attributes for other Data Models.</p>
+<p>All <a class="reference internal" href="#tbapi.Data" title="tbapi.Data"><code class="xref py py-class docutils literal"><span class="pre">Data</span></code></a> objects are extensions of the <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> class, meaning that the raw JSON used to create these objects can be obtained by treating the object as a dictionary rather than an object.</p>
+<p><a class="reference internal" href="#tbapi.Data" title="tbapi.Data"><code class="xref py py-class docutils literal"><span class="pre">Data</span></code></a> objects maintain a reference to the <a class="reference internal" href="#tbapi.Parser" title="tbapi.Parser"><code class="xref py py-class docutils literal"><span class="pre">Parser</span></code></a> object that created them in order to live pull further information later on down the road.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">When treating <a class="reference internal" href="#tbapi.Data" title="tbapi.Data"><code class="xref py py-class docutils literal"><span class="pre">Data</span></code></a> objects as dictionaries, all data is returned &#8220;as-is&#8221; by TBA.  No futher processing is done to transform second-level dictionaries into their own <a class="reference internal" href="#tbapi.Data" title="tbapi.Data"><code class="xref py py-class docutils literal"><span class="pre">Data</span></code></a> objects.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="status">
+<h3>Status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Status">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Status</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status Data Class: Represents the Status of The Blue Alliance API v3 and it&#8217;s associated applications.</p>
+<dl class="attribute">
+<dt id="tbapi.Status.android">
+<code class="descname">android</code><a class="headerlink" href="#tbapi.Status.android" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.App" title="tbapi.App"><code class="xref py py-class docutils literal"><span class="pre">App</span></code></a>: Android App Status information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Status.current_season">
+<code class="descname">current_season</code><a class="headerlink" href="#tbapi.Status.current_season" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Current FIRST Robotics Competition Season.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Status.down_events">
+<code class="descname">down_events</code><a class="headerlink" href="#tbapi.Status.down_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>A raw JSON array representing events that are currently down.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Status.ios">
+<code class="descname">ios</code><a class="headerlink" href="#tbapi.Status.ios" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.App" title="tbapi.App"><code class="xref py py-class docutils literal"><span class="pre">App</span></code></a>: iOS App Status Information</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Status.is_datafeed_down">
+<code class="descname">is_datafeed_down</code><a class="headerlink" href="#tbapi.Status.is_datafeed_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Boolean representing whether or not the datafeed is down.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Status.max_season">
+<code class="descname">max_season</code><a class="headerlink" href="#tbapi.Status.max_season" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum FIRST Robotics Competition Season.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="app">
+<h3>App<a class="headerlink" href="#app" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.App">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">App</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.App" title="Permalink to this definition">¶</a></dt>
+<dd><p>App Data Class: Represents TBA Mobile App Information.</p>
+<dl class="attribute">
+<dt id="tbapi.App.latest_app_version">
+<code class="descname">latest_app_version</code><a class="headerlink" href="#tbapi.App.latest_app_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Latest Available App Version on the represented Platform.</p>
+<p>Alias: <em>latest</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.App.min_app_version">
+<code class="descname">min_app_version</code><a class="headerlink" href="#tbapi.App.min_app_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Minimum Supported  App Version on the represented Platform.</p>
+<p>Alias: <em>minimum</em>, <em>min</em></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="team">
+<h3>Team<a class="headerlink" href="#team" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Team">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Team</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Team" title="Permalink to this definition">¶</a></dt>
+<dd><p>Team Data Class: Provides information regarding a given team.</p>
+<dl class="attribute">
+<dt id="tbapi.Team.address">
+<code class="descname">address</code><a class="headerlink" href="#tbapi.Team.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.city">
+<code class="descname">city</code><a class="headerlink" href="#tbapi.Team.city" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home City of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.country">
+<code class="descname">country</code><a class="headerlink" href="#tbapi.Team.country" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home Country of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.gmaps_place_id">
+<code class="descname">gmaps_place_id</code><a class="headerlink" href="#tbapi.Team.gmaps_place_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place ID of the represented team as registered in Google Maps.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.gmaps_url">
+<code class="descname">gmaps_url</code><a class="headerlink" href="#tbapi.Team.gmaps_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>A URL representing the location of the represented team in Google Maps.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.home_championship">
+<code class="descname">home_championship</code><a class="headerlink" href="#tbapi.Team.home_championship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary sorted by year containing the home championship of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.key">
+<code class="descname">key</code><a class="headerlink" href="#tbapi.Team.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Team Key of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.lat">
+<code class="descname">lat</code><a class="headerlink" href="#tbapi.Team.lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Latitude of the represented team.</p>
+<p>Alias: <em>latitude</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.lng">
+<code class="descname">lng</code><a class="headerlink" href="#tbapi.Team.lng" title="Permalink to this definition">¶</a></dt>
+<dd><p>Longitude of the represented team.</p>
+<p>Alias: <em>longitude</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.location_name">
+<code class="descname">location_name</code><a class="headerlink" href="#tbapi.Team.location_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the location of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.motto">
+<code class="descname">motto</code><a class="headerlink" href="#tbapi.Team.motto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Motto of the represented team</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.name">
+<code class="descname">name</code><a class="headerlink" href="#tbapi.Team.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full Name of the represented team</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.nickname">
+<code class="descname">nickname</code><a class="headerlink" href="#tbapi.Team.nickname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nickname of the represented team.</p>
+<p>Alias: <em>nick</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.postal_code">
+<code class="descname">postal_code</code><a class="headerlink" href="#tbapi.Team.postal_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Postal Code of the represented team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.rookie_year">
+<code class="descname">rookie_year</code><a class="headerlink" href="#tbapi.Team.rookie_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rookie Year of the represented team</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.state_prov">
+<code class="descname">state_prov</code><a class="headerlink" href="#tbapi.Team.state_prov" title="Permalink to this definition">¶</a></dt>
+<dd><p>State or Province of the represented team.</p>
+<p>Alias: <em>state</em>, <em>province</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.team_number">
+<code class="descname">team_number</code><a class="headerlink" href="#tbapi.Team.team_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Team Number of the represented team.</p>
+<p>Alias: <em>number</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Team.website">
+<code class="descname">website</code><a class="headerlink" href="#tbapi.Team.website" title="Permalink to this definition">¶</a></dt>
+<dd><p>Website URL for the represented team</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="district">
+<h3>District<a class="headerlink" href="#district" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.District">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">District</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.District" title="Permalink to this definition">¶</a></dt>
+<dd><p>District Data Class: Provides information regarding a given district.</p>
+<dl class="attribute">
+<dt id="tbapi.District.abbreviation">
+<code class="descname">abbreviation</code><a class="headerlink" href="#tbapi.District.abbreviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string representing a simple abbreviation of the represented district&#8217;s name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.District.display_name">
+<code class="descname">display_name</code><a class="headerlink" href="#tbapi.District.display_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string representing a human readable name for the represented district.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.District.key">
+<code class="descname">key</code><a class="headerlink" href="#tbapi.District.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key of the represented district.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.District.year">
+<code class="descname">year</code><a class="headerlink" href="#tbapi.District.year" title="Permalink to this definition">¶</a></dt>
+<dd><p>The year of operation of the represented district.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="robot">
+<h3>Robot<a class="headerlink" href="#robot" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Robot">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Robot</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Robot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Robot Data Class: Provides information about a robot belonging to a team in a given year.</p>
+<dl class="attribute">
+<dt id="tbapi.Robot.key">
+<code class="descname">key</code><a class="headerlink" href="#tbapi.Robot.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key of the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.name">
+<code class="descname">name</code><a class="headerlink" href="#tbapi.Robot.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.robot_name">
+<code class="descname">robot_name</code><a class="headerlink" href="#tbapi.Robot.robot_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.team">
+<code class="descname">team</code><a class="headerlink" href="#tbapi.Robot.team" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.Team" title="tbapi.Team"><code class="xref py py-class docutils literal"><span class="pre">Team</span></code></a>: The Team that owns the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.team_key">
+<code class="descname">team_key</code><a class="headerlink" href="#tbapi.Robot.team_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The team_key of the team that owns the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.team_number">
+<code class="descname">team_number</code><a class="headerlink" href="#tbapi.Robot.team_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>The team_number of the team that owns the represented robot.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Robot.year">
+<code class="descname">year</code><a class="headerlink" href="#tbapi.Robot.year" title="Permalink to this definition">¶</a></dt>
+<dd><p>The year in which the represented robot was built and competed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="social">
+<h3>Social<a class="headerlink" href="#social" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Social">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Social</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Social" title="Permalink to this definition">¶</a></dt>
+<dd><p>Social Media Data Class: Represents a team&#8217;s presense on a social media platform.</p>
+<dl class="attribute">
+<dt id="tbapi.Social.details">
+<code class="descname">details</code><a class="headerlink" href="#tbapi.Social.details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Details about the represented Social Media Presense.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Social.foreign_key">
+<code class="descname">foreign_key</code><a class="headerlink" href="#tbapi.Social.foreign_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Foreign Key for the represented Social Media Presense.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Social.key">
+<code class="descname">key</code><a class="headerlink" href="#tbapi.Social.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Foreign Key for the represented Social Media Presense.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Social.preferred">
+<code class="descname">preferred</code><a class="headerlink" href="#tbapi.Social.preferred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the given Social Media Presense is &#8220;preferred&#8221; by its Team.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Social.type">
+<code class="descname">type</code><a class="headerlink" href="#tbapi.Social.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of Social Media Presense represented.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="event">
+<h3>Event<a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.Event">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">Event</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Event Data Class:  Represents a given Event and it&#8217;s corresponding data.</p>
+<dl class="attribute">
+<dt id="tbapi.Event.address">
+<code class="descname">address</code><a class="headerlink" href="#tbapi.Event.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>The address of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.city">
+<code class="descname">city</code><a class="headerlink" href="#tbapi.Event.city" title="Permalink to this definition">¶</a></dt>
+<dd><p>The city of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.code">
+<code class="descname">code</code><a class="headerlink" href="#tbapi.Event.code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The event code for the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.country">
+<code class="descname">country</code><a class="headerlink" href="#tbapi.Event.country" title="Permalink to this definition">¶</a></dt>
+<dd><p>The country of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.district">
+<code class="descname">district</code><a class="headerlink" href="#tbapi.Event.district" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.District" title="tbapi.District"><code class="xref py py-class docutils literal"><span class="pre">District</span></code></a>: The District in which the represented event takes place, if available.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.end">
+<code class="descname">end</code><a class="headerlink" href="#tbapi.Event.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ending date of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.end_date">
+<code class="descname">end_date</code><a class="headerlink" href="#tbapi.Event.end_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ending date of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.event_code">
+<code class="descname">event_code</code><a class="headerlink" href="#tbapi.Event.event_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The event code for the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.event_type">
+<code class="descname">event_type</code><a class="headerlink" href="#tbapi.Event.event_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.event_type_string">
+<code class="descname">event_type_string</code><a class="headerlink" href="#tbapi.Event.event_type_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string representing the type of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.first_event_id">
+<code class="descname">first_event_id</code><a class="headerlink" href="#tbapi.Event.first_event_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>I have no idea what this does.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.gmaps_place_id">
+<code class="descname">gmaps_place_id</code><a class="headerlink" href="#tbapi.Event.gmaps_place_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The google maps place id of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.gmaps_url">
+<code class="descname">gmaps_url</code><a class="headerlink" href="#tbapi.Event.gmaps_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The google maps url of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.key">
+<code class="descname">key</code><a class="headerlink" href="#tbapi.Event.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key for the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.lat">
+<code class="descname">lat</code><a class="headerlink" href="#tbapi.Event.lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>A float representing the latitude of the represented event&#8217;s venue.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.latitude">
+<code class="descname">latitude</code><a class="headerlink" href="#tbapi.Event.latitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>A float representing the latitude of the represented event&#8217;s venue.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.lng">
+<code class="descname">lng</code><a class="headerlink" href="#tbapi.Event.lng" title="Permalink to this definition">¶</a></dt>
+<dd><p>A float representing the latitude of the represented event&#8217;s venue.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.location_name">
+<code class="descname">location_name</code><a class="headerlink" href="#tbapi.Event.location_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the location at which the represented event takes place.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.longitude">
+<code class="descname">longitude</code><a class="headerlink" href="#tbapi.Event.longitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>A float representing the longitude of the represented event&#8217;s venue.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.name">
+<code class="descname">name</code><a class="headerlink" href="#tbapi.Event.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.postal_code">
+<code class="descname">postal_code</code><a class="headerlink" href="#tbapi.Event.postal_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The postal code of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.province">
+<code class="descname">province</code><a class="headerlink" href="#tbapi.Event.province" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state or province of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.short_name">
+<code class="descname">short_name</code><a class="headerlink" href="#tbapi.Event.short_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The short name of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.start">
+<code class="descname">start</code><a class="headerlink" href="#tbapi.Event.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>The starting date of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.start_date">
+<code class="descname">start_date</code><a class="headerlink" href="#tbapi.Event.start_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>The starting date of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.state">
+<code class="descname">state</code><a class="headerlink" href="#tbapi.Event.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state or province of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.state_prov">
+<code class="descname">state_prov</code><a class="headerlink" href="#tbapi.Event.state_prov" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state or province of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.timezone">
+<code class="descname">timezone</code><a class="headerlink" href="#tbapi.Event.timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timezone of the venue of the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.webcasts">
+<code class="descname">webcasts</code><a class="headerlink" href="#tbapi.Event.webcasts" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#tbapi.DataList" title="tbapi.DataList"><code class="xref py py-class docutils literal"><span class="pre">DataList</span></code></a>: A DataList of <code class="xref py py-class docutils literal"><span class="pre">Webcast</span></code> objects for the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.website">
+<code class="descname">website</code><a class="headerlink" href="#tbapi.Event.website" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Website for the represented event.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.week">
+<code class="descname">week</code><a class="headerlink" href="#tbapi.Event.week" title="Permalink to this definition">¶</a></dt>
+<dd><p>The event week in which the represented event takes place.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tbapi.Event.year">
+<code class="descname">year</code><a class="headerlink" href="#tbapi.Event.year" title="Permalink to this definition">¶</a></dt>
+<dd><p>The year in which the represented event takes place.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="event-status">
+<h3>Event Status<a class="headerlink" href="#event-status" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tbapi.EventStatus">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">EventStatus</code><span class="sig-paren">(</span><em>json_array</em>, <em>parser</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tbapi.EventStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>EventStatus Data Class: Represents the status of a team at a given event.</p>
+<p>TODO: Finish this data class and add object generation to <a class="reference internal" href="#tbapi.Parser" title="tbapi.Parser"><code class="xref py py-class docutils literal"><span class="pre">Parser</span></code></a></p>
+<dl class="attribute">
+<dt id="tbapi.EventStatus.alliance">
+<code class="descname">alliance</code><a class="headerlink" href="#tbapi.EventStatus.alliance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic information about the team&#8217;s playoff alliance.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tbapi.EmptyError">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">EmptyError</code><a class="headerlink" href="#tbapi.EmptyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXCEPTION: Data Class is EMPTY.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tbapi.ParseError">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">ParseError</code><a class="headerlink" href="#tbapi.ParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXCEPTION: Data Class errored during data parsing.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tbapi.KeyInputError">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">KeyInputError</code><a class="headerlink" href="#tbapi.KeyInputError" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXCEPTION: Inpropper Key passed during data parsing.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tbapi.OfflineError">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">OfflineError</code><a class="headerlink" href="#tbapi.OfflineError" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXCEPTION: Network Conenction to The Blue Alliance is Offline.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tbapi.FluidKeyError">
+<em class="property">class </em><code class="descclassname">tbapi.</code><code class="descname">FluidKeyError</code><a class="headerlink" href="#tbapi.FluidKeyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXCEPTION: Fluid Key not available</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TBApi - A Python Wrapper for The Blue Alliance API v3</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#parser">Parser</a></li>
+<li><a class="reference internal" href="#data-classes">Data Classes</a><ul>
+<li><a class="reference internal" href="#data-list">Data List</a></li>
+<li><a class="reference internal" href="#data">Data</a></li>
+<li><a class="reference internal" href="#status">Status</a></li>
+<li><a class="reference internal" href="#app">App</a></li>
+<li><a class="reference internal" href="#team">Team</a></li>
+<li><a class="reference internal" href="#district">District</a></li>
+<li><a class="reference internal" href="#robot">Robot</a></li>
+<li><a class="reference internal" href="#social">Social</a></li>
+<li><a class="reference internal" href="#event">Event</a></li>
+<li><a class="reference internal" href="#event-status">Event Status</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exceptions">Exceptions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Plasma Robotics, FRC Team 2403.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

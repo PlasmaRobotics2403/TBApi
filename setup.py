@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='tbapi',
-      version='1.3.1a6',
+      version='1.3.1a8',
       description='A Python Library for connection to The Blue Alliance API v2 and v3 | Created by Plasma Robotics, Team 2403',
       url='https://github.com/PlasmaRobotics2403/TBApi',
       author='Plasma Robotics | FRC Team 2403',

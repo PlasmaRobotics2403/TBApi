@@ -24,11 +24,11 @@ class ParseError(Exception):
         Exception.__init__(self, 'Data Class errored during data parsing.')
 
 
-# EXCEPTION: Impropper Key passed during data parsing
+# EXCEPTION: Inpropper Key passed during data parsing
 class KeyInputError(Exception):
-    """EXCEPTION: Impropper Key passed during data parsing."""
+    """EXCEPTION: Inpropper Key passed during data parsing."""
     def __init__(self):
-        Exception.__init__(self, 'Impropper Key passed during data parsing.')
+        Exception.__init__(self, 'Inpropper Key passed during data parsing.')
 
 
 # EXCEPTION: Network Connection to The Blue Alliance is Offline
@@ -38,6 +38,13 @@ class OfflineError(Exception):
         Exception.__init__(self, 'Network Connection to The Blue Alliance is Offline.')
 
 
+# EXCEPTION: Fluid Key not available
+class FluidKeyError(Exception):
+    """EXCEPTION: Fluid Key not available"""
+    def __init__(self):
+        Exception.__init__(self, 'Fluid Key not availble.  Key may not be available for the represented Season, if applicable.')
+
+
 # List-Extension Class:  Adds extra functionality to lists used for data-returns
 class DataList(list):
     """List-Extension used for storing data objects with extra information."""
@@ -45,7 +52,7 @@ class DataList(list):
         super().__init__(*args, **kwargs)
 
         self.extend(data_list)
-        self.raw = json_array
+        self._json_array = json_array
 
         self.is_error = False
 
@@ -55,7 +62,9 @@ class DataList(list):
 
     # A method allowing for end-users to filter data-points by specific attributes, ex: team number.
     def filter(self, attr_name, attr_value):
-        """Filter the stored objects by a given attribute.  Returns a new DataList."""
+        """Filter the stored objects by a given attribute with a given value.
+            
+            Returns new DataList containing only Data Objects with attribute ``attr_name`` containing ``attr_value``."""
 
         return_list = self.__class__([], [])
 
@@ -64,9 +73,15 @@ class DataList(list):
 
             if str(attr_value).lower() in str(actual_attribute).lower():
                 return_list.append(data_object)
-                return_list.raw.append(data_object.raw)
+                return_list.raw.append(dict(data_object))
 
         return return_list
+    
+    # Return the raw JSON array used to create the list and it's contained Data objects.
+    @property
+    def raw(self):
+        """Returns the raw JSON array used to create the :class:`DataList` object and it's contained :class:`Data` objects."""
+        return self._json_array
 
     # Customize Object Description Output to identify the given list as a DataList
     def __repr__(self):
@@ -76,22 +91,113 @@ class DataList(list):
 
     # A method to return the standard Object Description Output if needed by the user
     @property
-    def list_representation(self):
-        """Return a JSON-like representation of the data in the list."""
+    def __representation(self):
+        """Return a JSON-like string representation of the data in the list."""
         return super().__repr__()
 
 
 # Basic Data Class:  Stores information about data returned by TBA by the parser.
 class Data(dict):
-    """Base Data Class:  Meant for extension by base data models."""
-    def __init__(self, json_array, identifier='Generic Data Object'):
+    """Basic Data Class, extended with attributes for other Data Models.
+        
+        All :class:`Data` objects are extensions of the :class:`dict` class, meaning that the raw JSON used to create these objects can be obtained by treating the object as a dictionary rather than an object.
+        
+        :class:`Data` objects maintain a reference to the :class:`Parser` object that created them in order to live pull further information later on down the road.
+        
+        .. warning::
+            When treating :class:`Data` objects as dictionaries, all data is returned "as-is" by TBA.  No futher processing is done to transform second-level dictionaries into their own :class:`Data` objects."""
+    def __init__(self, json_array, parser, options=None):
         self.update(json_array)
-        self.identifier = identifier
+        self.parser = parser
+        
+        if not options == None:
+            self.options = options
+        else:
+            self.options = {'force_new':False, 'force_cache':False, 'log_cache':False}
+
+    # When referenced in terminal without called attribute, identify as a Data object
+    def __repr__(self):
+        """Return a modified object Description for more useful identification in the console."""
+        return '<tbapi.Data: Custon Data Object>'
+
+
+# Status Data Class: Represents the Status of The Blue Alliance API v3.
+class Status(Data):
+    """Status Data Class: Represents the Status of The Blue Alliance API v3 and it's associated applications."""
+    
+    @property
+    def android(self):
+        """:class:`App`: Android App Status information."""
+        modified_dict = self['android']
+        modified_dict['platform'] = 'Android'
+        return App(modified_dict)
+    
+    @property
+    def ios(self):
+        """:class:`App`: iOS App Status Information"""
+        modified_dict = self['ios']
+        modified_dict['platform'] = 'iOS'
+        return App(modified_dict)
+    
+    @property
+    def current_season(self):
+        """The Current FIRST Robotics Competition Season."""
+        return self['current_season']
+    
+    @property
+    def max_season(self):
+        """The maximum FIRST Robotics Competition Season."""
+        return self['max_season']
+    
+    @property
+    def is_datafeed_down(self):
+        """A Boolean representing whether or not the datafeed is down."""
+        return bool(self['is_datafeed_down'])
+    
+    @property
+    def down_events(self):
+        """A raw JSON array representing events that are currently down."""
+        return self['down_events']
+    
+    def __repr__(self):
+        """Modified Reference Return"""
+        return '<tbapi.Status: API Status Keys>'
+
+
+# App Data Class: Represents TBA Mobile App Information.
+class App(Data):
+    """App Data Class: Represents TBA Mobile App Information."""
+
+    @property
+    def latest_app_version(self):
+        """The Latest Available App Version on the represented Platform.
+            
+            Alias: *latest*"""
+        return self['latest_app_version']
+
+    @property
+    def latest(self):
+        return self['latest_app_version']
+
+    @property
+    def min_app_version(self):
+        """The Minimum Supported  App Version on the represented Platform.
+            
+            Alias: *minimum*, *min*"""
+        return self['min_app_version']
+
+    @property
+    def minimum(self):
+        return self['min_app_version']
+
+    @property
+    def min(self):
+        return self['min_app_version']
 
     # When referenced in terminal without called attribute, identify as a Data object
     def __repr__(self):
         """Return the Team Key Nickname as the Object Description"""
-        return '<tbapi.Data: {}>'.format(self.identifier)
+        return '<tbapi.App: {} Platform>'.format(self['platform'])
 
 
 # Team Data Class: Provides team information returned by TBA by the parser.
@@ -100,27 +206,29 @@ class Team(Data):
 
     @property
     def key(self):
-        """Team Key of the represented team"""
+        """Team Key of the represented team."""
         return self['key']
 
     @property
     def team_number(self):
-        """Team Number of the represented team"""
+        """Team Number of the represented team.
+            
+            Alias: *number*"""
         return self['team_number']
 
     @property
     def number(self):
-        """Team Number of the represented team"""
         return self['team_number']
 
     @property
     def nickname(self):
-        """Nickname of the represented team"""
+        """Nickname of the represented team.
+            
+            Alias: *nick*"""
         return self['nickname']
 
     @property
     def nick(self):
-        """Nickname of the represented team"""
         return self['nickname']
 
     @property
@@ -145,77 +253,79 @@ class Team(Data):
 
     @property
     def address(self):
-        """Address of the represented team"""
+        """Address of the represented team."""
         return self['address']
 
     @property
     def city(self):
-        """Home City of the represented team"""
+        """Home City of the represented team."""
         return self['city']
 
     @property
-    def state(self):
-        """State or Province of the represented team"""
-        return self['state_prov']
-
-    @property
     def state_prov(self):
-        """State or Province of the represented team"""
+        """State or Province of the represented team.
+            
+            Alias: *state*, *province*"""
+        return self['state_prov']
+    
+    @property
+    def state(self):
         return self['state_prov']
 
     @property
     def province(self):
-        """State or Province of the represented team"""
         return self['state_prov']
 
     @property
     def country(self):
-        """Home Country of the represented team"""
+        """Home Country of the represented team."""
         return self['country']
 
     @property
     def postal_code(self):
-        """Postal Code of the represented team"""
+        """Postal Code of the represented team."""
         return self['postal_code']
 
     @property
     def location_name(self):
-        """Name of the location of the represented team"""
+        """Name of the location of the represented team."""
         return self['location_name']
 
     @property
     def lat(self):
-        """Latitude of the represented team"""
+        """Latitude of the represented team.
+            
+            Alias: *latitude*"""
         return self['lat']
 
     @property
     def latitude(self):
-        """Latitude of the represented team"""
         return self['lat']
 
     @property
     def lng(self):
-        """Longitude of the represented team"""
+        """Longitude of the represented team.
+            
+            Alias: *longitude*"""
         return self['lng']
 
     @property
     def longitude(self):
-        """Longitude of the represented team"""
         return self['lng']
 
     @property
     def home_championship(self):
-        """Dictionary sorted by year containing the home championship of the represented team"""
+        """Dictionary sorted by year containing the home championship of the represented team."""
         return self['home_championship']
 
     @property
     def gmaps_place_id(self):
-        """Place ID of the represented team as registered in Google Maps"""
+        """Place ID of the represented team as registered in Google Maps."""
         return self['gmaps_place_id']
 
     @property
     def gmaps_url(self):
-        """A URL representing the location of the represented team in Google Maps"""
+        """A URL representing the location of the represented team in Google Maps."""
         return self['gmaps_url']
 
     # When referenced in terminal without called attribute, output team_number & nick (readability)
@@ -300,8 +410,8 @@ class Robot(Data):
 
     @property
     def team(self):
-        """The team_key of the team that owns the represented robot."""
-        return self['team_key']
+        """:class:`Team`: The Team that owns the represented robot."""
+        return self.parser.get_team(self['team_key'], force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
 
     @property
     def team_number(self):
@@ -350,7 +460,7 @@ class Social(Data):
 
     @property
     def preferred(self):
-        """Whether or not the given Social Media Presense is preferred by it's team."""
+        """Whether or not the given Social Media Presense is "preferred" by its Team."""
         return self['preferred']
 
     @property
@@ -435,10 +545,10 @@ class Event(Data):
 
     @property
     def webcasts(self):
-        """A list of Webcast Objects for the represented event."""
+        """:class:`DataList`: A DataList of :class:`Webcast` objects for the represented event."""
         modified_return = self['webcasts']
         modified_return['event'] = '{} ({})'.format(self.name, self.key)
-        return DataList([Webcast(webcast_item) for webcast_item in modified_return], self['webcasts'])
+        return DataList([Webcast(webcast_item, self.parser, self.options) for webcast_item in modified_return], self['webcasts'])
 
     @property
     def website(self):
@@ -447,8 +557,8 @@ class Event(Data):
 
     @property
     def district(self):
-        """The District in which the represented event takes place, if available."""
-        return self['district']
+        """:class:`District`: The District in which the represented event takes place, if available."""
+        return District(self['district'], self.parser, self.options)
 
     @property
     def location_name(self):
@@ -536,6 +646,18 @@ class Event(Data):
         return '<tbapi.Event: {} ({})>'.format(self.name, self.key)
 
 
+# EventStatus Data Class: Represents the status of a team at a given event.
+class EventStatus(Data):
+    """EventStatus Data Class: Represents the status of a team at a given event.
+        
+        TODO: Finish this data class and add object generation to :class:`Parser`"""
+
+    @property
+    def alliance(self):
+        """Basic information about the team's playoff alliance."""
+        return TeamAlliance(self['alliance'])
+
+
 # Webcast Data Class: Represents a webcast for a given event and its corresponding data.
 class Webcast(Data):
     """Webcast Data Class: Represents a webcast for a given event and its corresponding data."""
@@ -572,9 +694,9 @@ class Webcast(Data):
         else:
             return None
 
-    # When referenced in terminal without called attribute, output event information.
+    # When referenced in terminal without called attribute, output webcast information.
     def __repr__(self):
-        """Return event information when referenced."""
+        """Return webcast information when referenced."""
         return '<tbapi.Webcast: Webcast for {}>'.format(self['event'])
 
 
@@ -592,7 +714,212 @@ class Video(Data):
         """The type of represented video."""
         return self['type']
 
-# Webcast Data Class: Represents a webcast for a given event and its corresponding data.
+    # When referenced in terminal without called attribute, output video information.
+    def __repr__(self):
+        """Return video information when referenced."""
+        return '<tbapi.Video: Video for {}>'.format(self['match'])
+
+
+# Alliance Data Class:  Represents an Alliance that participated in a given Match.
+class Alliance(Data):
+    """Alliance Data Class:  Represents an Alliance that participated in a given Match."""
+
+    @property
+    def score(self):
+        """The score earned by the represented Alliance in a given Match."""
+        return self['score']
+
+    @property
+    def team_keys(self):
+        """A list of team keys representing the teams that participated on the represented Alliance."""
+        return self['team_keys']
+
+    @property
+    def teams(self):
+        """A list of team keys representing the teams that participated on the represented Alliance."""
+        return self['team_keys']
+
+    @property
+    def surrogate_team_keys(self):
+        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
+        return self['surrogate_team_keys']
+
+    @property
+    def surrogate_teams(self):
+        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
+        return self['surrogate_team_keys']
+
+    @property
+    def surrogates(self):
+        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
+        return self['surrogate_team_keys']
+
+    # When referenced in terminal without called attribute, output alliance information.
+    def __repr__(self):
+        """Return alliance information when referenced."""
+        alliance_members = ''
+
+        for key in self['team_keys']:
+            alliance_members += key[3:] + ' '
+
+        return '<tbapi.Alliance: {}>'.format(alliance_members[:-1])
+
+
+# AllianceSet Data Class:  Wrapper for both Alliances that competed in a given Match.
+class AllianceSet(Data):
+    """AllianceSet Data Class:  Wrapper for both Alliances that competed in a given Match."""
+
+    @property
+    def red(self):
+        """The red Alliance for a given Match."""
+        return Alliance(self['red'])
+
+    @property
+    def r(self):
+        """The red Alliance for a given Match."""
+        return Alliance(self['red'])
+
+    @property
+    def blue(self):
+        """The blue Alliance for a given Match."""
+        return Alliance(self['blue'])
+
+    @property
+    def b(self):
+        """The blue Alliance for a given Match."""
+        return Alliance(self['blue'])
+
+    # When referenced in terminal without called attribute, output alliance set information.
+    def __repr__(self):
+        """Return set information when referenced."""
+        red_alliance = ''
+        blue_alliance = ''
+
+        for key in self['red']['team_keys']:
+            red_alliance += key[3:] + ', '
+
+        for key in self['blue']['team_keys']:
+            blue_alliance += key[3:] + ', '
+
+        return '<tbapi.AllianceSet: RED[{}], BLUE[{}]>'.format(red_alliance[:-2], blue_alliance[:-2])
+
+
+# TeamAlliance Data Class: Represents a Team's Association to a given Alliance.
+class TeamAlliance(Data):
+    """TeamAlliance Class:  Represents a Team's Association to a given Alliance."""
+
+    @property
+    def backup(self):
+        """Information on Backup Swaps involving a given team."""
+        if self['backup'] != None:
+            return Backup(self['backup'])
+        else:
+            return None
+
+    @property
+    def name(self):
+        """The name of the given Alliance."""
+        return self['name']
+
+    @property
+    def number(self):
+        """The number of the given Alliance."""
+        return self['number']
+
+    @property
+    def pick(self):
+        """The pick number of the given Alliance."""
+        return self['pick']
+
+    @property
+    def pick_position(self):
+        """The pick number of the given Alliance."""
+        return self['pick']
+
+    # When referenced in terminal without called attribute, output customized string.
+    def __repr__(self):
+        """Return custom string when referenced."""
+        return '<tbapi.TeamAlliance>'
+
+    # When converted to a string, return the alliance number.
+    def __str__(self):
+        """Return the Robot Key when converted to a String."""
+        return self['name']
+
+    # When converted to an integer, return the alliance number.
+    def __int__(self):
+        """Return the robot build year when converted to an Integer."""
+        return int(self['number']) # Convert to an integer, in case of errors in JSON parsing.
+
+
+# Backup Data Class: Information on Backup Swaps involving a given Team on a given Alliance at a given Event.
+class Backup(Data):
+    """Backup Data Class: Information on Backup Swaps involving a given Team on a given Alliance at a given Event."""
+
+    @property
+    def team_in(self):
+        """The Team that joined the Alliance."""
+        return self['in']
+
+    @property
+    def team_out(self):
+        """The Team that left the Alliance (in terms of playing)."""
+        return self['in']
+
+    # When referenced in terminal without called attribute, output customized string.
+    def __repr__(self):
+        """Return custom string when referenced."""
+        return '<tbapi.Backup>'
+
+
+# Breakdown Data Class: Fluid Match Statistics for a given Alliance in a given Match.
+class Breakdown(Data):
+    """Breakdown Class: Fluid Match Statistics for a given Alliance in a given Match."""
+
+    # Get a fluid key from the internal data dictionary.
+    def get(self, key):
+        """Get a fluid key from the internal data dictionary."""
+        if not key in self.keys():
+            raise FluidKeyError
+        else:
+            return self[key]
+
+    # When referenced in terminal without called attribute, output customized string.
+    def __repr__(self):
+        """Return custom string when referenced."""
+        return '<tbapi.Breakdown>'
+
+# BreakdownSet Data Class: Wrapper for Breakdowns for a given Match.
+class BreakdownSet(Data):
+    """BreakdownSet Data Class: Wrapper for Breakdowns for a given Match."""
+
+    @property
+    def red(self):
+        """Breakdown for the red Alliance for a given Match."""
+        return Breakdown(self['red'])
+
+    @property
+    def r(self):
+        """Breakdown for the red Alliance for a given Match."""
+        return Breakdown(self['red'])
+
+    @property
+    def blue(self):
+        """Breakdown for the blue Alliance for a given Match."""
+        return Breakdown(self['blue'])
+
+    @property
+    def b(self):
+        """Breakdown for the blue Alliance for a given Match."""
+        return Breakdown(self['blue'])
+
+    # When referenced in terminal without called attribute, output breakdown set information.
+    def __repr__(self):
+        """Return breakdown set information when referenced."""
+        return '<tbapi.BreakdownSet>'
+
+
+# Match Data Class: Represents a match played at a given event and its corresponding data.
 class Match(Data):
     """Match Data Class: Represents a match at a given event and its corresponding data."""
 
@@ -671,6 +998,104 @@ class Match(Data):
         """A Datetime representation of the Score Post Time."""
         return datetime.datetime.fromtimestamp(int(self['post_result_time']))
 
+    @property
+    def videos(self):
+        """A DataList of Videos showing the given Match."""
+        modified_video_list = []
+
+        for video_item in self['videos']:
+            modified_video = video_item.copy()
+            modified_video['match'] = self['key']
+            modified_video_list += [modified_video]
+
+        return DataList([Video(video_item) for video_item in modified_video_list], self['videos'])
+
+    @property
+    def winning_alliance(self):
+        """A String representing the color of the winning alliance."""
+        return self['winning_alliance']
+
+    @property
+    def alliances(self):
+        """A Wrapper containing both alliances that participated in the represented match."""
+        return AllianceSet(self['alliances'])
+
+    @property
+    def red_alliance(self):
+        """The red Alliance that participated in the represented match."""
+        return Alliance(self['alliances']['red'])
+
+    @property
+    def blue_alliance(self):
+        """The red Alliance that participated in the represented match."""
+        return Alliance(self['alliances']['blue'])
+
+    # When referenced in terminal without called attribute, output match information.
+    def __repr__(self):
+        """Return match information when referenced."""
+        return '<tbapi.Match: {} - {}>'.format(self['key'], '{} Alliance ({} pts)'.format(self['winning_alliance'].capitalize(), self['alliances'][self['winning_alliance']]['score']) if not self['winning_alliance'] == '' else 'tied')
+
+
+# Recipient Data Class: Represents the Recipient of an Award given at a defined Event.
+class Recipient(Data):
+    """Recipient Data Class: Represents the Recipient of an Award given at a defined Event."""
+
+    @property
+    def team_key(self):
+        """The key of the Recipient Team"""
+        return self['team_key']
+
+    @property
+    def team(self):
+        """The key of the Recipient Team"""
+        return self['team_key']
+
+    @property
+    def awardee(self):
+        """The Individual Person to who'm the award was presented."""
+        return self['awardee']
+
+    # When referenced in terminal without called attribute, output recipient information.
+    def __repr__(self):
+        """Return Recipient Information when referenced."""
+        return '<tbapi.Recipient: {}'.format(self['team_key'])
+
+
+
+# Awards Data Class: Represents an Award given at a defined Event.
+class Award(Data):
+    """Awards Data Class: Represents an Award given at a defined Event."""
+
+    @property
+    def name(self):
+        """The name of the represented Award."""
+        return self['name']
+
+    @property
+    def award_type(self):
+        """An Integer representing the type of represented Award."""
+        return self['award_type']
+
+    @property
+    def type(self):
+        """An Integer representing the type of represented Award."""
+        return self['award_type']
+
+    @property
+    def event_key(self):
+        """The key for the Event at which the Award was given."""
+        return self['event_key']
+
+    @property
+    def recipient_list(self):
+        """A list of Recipients to which the represented award was presented."""
+        return DataList([Recipient(recipient_item) for recipient_item in self['recipient_list']], self['recipient_list'])
+
+    # When referenced in terminal without called attribute, output award information.
+    def __repr__(self):
+        """Return Award Information when referenced."""
+        return '<tbapi.Award: {} @ {}'.format(self['name'], self['event_key'])
+
 
 # Cache Database Defaults Class: Used for setting up default columns in the cache database.
 class CacheTable(object):
@@ -708,6 +1133,11 @@ class Parser:
             if not self.cache_db.table('cache_data').tableExists():
                 cache_preset = CacheTable()
                 self.cache_db.table('cache_data').init(cache_preset)
+
+    # Modify the response when outputted in the terminal or when converted to a string.
+    def __repr__(self):
+        """Modified Response Return"""
+        return '<tbapi.Parser: \'{}\'>'.format(self.api_key)
 
     # Method to pull JSON array from TBA v3 API.  Includes Caching and Offline Support.
     def pull_response_json(self, path, *, force_new=False, force_cache=False, log_cache=False):
@@ -845,9 +1275,14 @@ class Parser:
 
 
     ### CALL METHODS
+    # Get TBA API Status
+    def get_status(self, *, force_new=False, force_cache=False, log_cache=False):
+        """:class:`Status`: the Status of The Blue Alliance's API and its Apps."""
+        return Status(self.pull_response_json('/status', force_new=False, force_cache=False, log_cache=False), self)
+
     # Get a List of FRC Teams
     def get_team_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of teams.  'page' and 'year' values optional."""
+        """:class:`DataList`: a list of :class:`Team` objects.  'page' and 'year' values optional."""
         if not page is None:
             return self.__get_team_list_page(page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -872,8 +1307,7 @@ class Parser:
         page_list = DataList([], return_array)
 
         for item in return_array:
-            team_obj = Team(item)
-            page_list.append(team_obj)
+            page_list.append(Team(item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}))
 
         return page_list
 
@@ -900,7 +1334,6 @@ class Parser:
         """HELPER METHOD: Get a single page of team keys."""
         return self.pull_response_json('/teams/{}{}/keys'.format('{}/'.format(year) if not year is None else '', str(page)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
 
-
     # HELPER: convert team_number or team_key input to uniform team_key
     def __get_team_key(self, team_identifier):
         """Convert team_number or team_key to uniform team_key for request path generation."""
@@ -916,43 +1349,97 @@ class Parser:
 
     # Get information about a single FRC Team by team number or team key
     def get_team(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a single team, by 'team_key' or 'team_number'."""
-        return Team(self.pull_response_json('/team/{}'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache))
+        """:class:`Team`: Get a single team, by 'team_key' or 'team_number'."""
+        return Team(self.pull_response_json('/team/{}'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache), self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache})
 
     # Get a list containing the years in which a given team has participated
     def get_team_years_participated(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list containing the years in which a given team has participated."""
+        """:class:`list`: a list containing the years in which a given team has participated."""
         return self.pull_response_json('/team/{}/years_participated'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
     
     # Get a list of Districts that the given team has competed in
     def get_team_districts(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of districts in which the given team has competed in."""
+        """:class:`DataList`: a list of :class:`District` objects in which the given team has competed in."""
         district_list = self.pull_response_json('/team/{}/districts'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
-        return DataList([District(district_item) for district_item in district_list], district_list)
+        return DataList([District(district_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for district_item in district_list], district_list)
 
     # Get a list of Robots built and operated by a given team
     def get_team_robots(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of robots built and operated by a given team."""
+        """:class:`DataList`: a list of :class:`Robot` objects built and operated by a given team."""
         robot_list = self.pull_response_json('/team/{}/robots'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
-        return DataList([Robot(robot_item) for robot_item in robot_list], robot_list)
+        return DataList([Robot(robot_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for robot_item in robot_list], robot_list)
 
     # Get a list of Social Media Presences operated by a given team.
     def get_team_social_media(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of Social Media Presences operated by a given team."""
+        """:class:`DataList`: a list of :class:`Social` objects (Social Media Prescenses) operated by a given team.
+            
+            Alias: *get_team_social*"""
         social_list = self.pull_response_json('/team/{}/social_media'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
-        return DataList([Social(social_item) for social_item in social_list], social_list)
+        return DataList([Social(social_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for social_item in social_list], social_list)
 
     # ALIAS: get_team_social_media
     def get_team_social(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of Social Media Presences operated by a given team."""
         return self.get_team_social_media(team_identifier, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
 
     # Get a list of events attended by a given team
     def get_team_events(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of Events attended by a given team"""
+        """:class:`DataList`: a list of :class:`Event` objects attended by a given team."""
         if not year:
             event_list = self.pull_response_json('/team/{}/events'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
-            return DataList([Event(event_item) for event_item in event_list], event_list)
+            return DataList([Event(event_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for event_item in event_list], event_list)
         else:
             event_list = self.pull_response_json('/team/{}/events/{}'.format(self.__get_team_key(team_identifier), str(year)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
-            return DataList([Event(event_item) for event_item in event_list], event_list)
+            return DataList([Event(event_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for event_item in event_list], event_list)
+
+    # Get a list of Matches played by a given Team at a given Event
+    def get_team_event_matches(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
+        """:class:`DataList`: a list of :class:`Match` objects played by a given Team at a given Event."""
+        match_list = self.pull_response_json('/team/{}/event/{}/matches'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Match(match_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for match_item in match_list], match_list)
+
+    # Get a list of Awards presented to a given Team at a given Event
+    def get_team_event_awards(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
+        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team at a given Event."""
+        award_list = self.pull_response_json('/team/{}/event/{}/awards'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Award(award_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for award_item in award_list], award_list)
+
+    # Get information about the status of a given team at a given event
+    def get_team_event_status(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
+        """Get information about the status of a given team at a given event."""
+        return self.pull_response_json('/team/{}/event/{}/status'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+
+    # Get a list of Awards presented to a given Team throughout their History
+    def get_team_awards(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
+        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team throughout their History."""
+        award_list = self.pull_response_json('/team/{}/awards{}'.format(self.__get_team_key(team_identifier), '/{}'.format(year) if year else ''), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Award(award_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for award_item in award_list], award_list)
+
+    # Get a list of Matches played by a given Team throughout their History
+    def get_team_matches(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
+        """:class:`DataList`: a list of :class:`Match` objects played by a given Team throughout their History"""
+        if year:
+            return self.__get_team_year_matches(team_identifier, year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        else:
+            try:
+                team_object = self.get_team(team_identifier, force_cache=True)
+            except:
+                raise Exception('YearParseError:  Could not find team\'s rookie year.')
+
+            final_data = DataList([], [])
+
+            for partial_year in range((int(team_object.rookie_year) - 1), int(year)):
+                try:
+                    partial_data = self.__get_team_year_matches(team_identifier, partial_year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+                except EmptyError:
+                    pass
+
+                final_data += partial_data
+                final_data.raw += partial_data.raw
+
+            return final_data
+
+    # HELPER: Get a single page of Team Matches from a given year
+    def __get_team_year_matches(self, team_identifier, year, *, force_new=False, force_cache=False, log_cache=False):
+        """HELPER: Get a single page of Team Matches from a given year"""
+        match_list = self.pull_response_json('/team/{}/matches/{}'.format(self.__get_team_key(team_identifier), year), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
+        return DataList([Match(match_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for match_item in match_list], match_list)

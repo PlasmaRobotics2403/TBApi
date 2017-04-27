@@ -1,0 +1,29 @@
+.. TBApi documentation master file, created by
+   sphinx-quickstart on Tue Apr 25 17:08:22 2017.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+#####################################################
+TBApi - A Python Wrapper for The Blue Alliance API v3
+#####################################################
+
+
+************
+Installation
+************
+
+Python3+ is required for usage with TBApi.  To install Python3+ and PIP for your system, visit `python.org <https://www.python.org/downloads/>`_.
+
+*****
+Usage
+*****
+
+
+************
+Data Classes
+************
+
+
+**********
+Exceptions
+**********
