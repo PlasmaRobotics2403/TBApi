@@ -121,6 +121,69 @@ Event Status
 .. autoclass:: EventStatus
   :members:
 
+=======
+Webcast
+=======
+
+.. autoclass:: Webcast
+  :members:
+
+=====
+Video
+=====
+
+.. autoclass:: Video
+  :members:
+
+============
+Alliance Set
+============
+
+.. autoclass:: AllianceSet
+  :members:
+
+========
+Alliance
+========
+
+.. autoclass:: Alliance
+  :members:
+
+=============
+Team Alliance
+=============
+
+.. autoclass:: TeamAlliance
+  :members:
+
+======
+Backup
+======
+
+.. autoclass:: Backup
+  :members:
+
+=========
+Breakdown
+=========
+
+.. autoclass:: Breakdown
+  :members:
+
+=============
+Breakdown Set
+=============
+
+.. autoclass:: BreakdownSet
+  :members:
+
+=====
+Match
+=====
+
+.. autoclass:: Match
+  :members:
+
 **********
 Exceptions
 **********

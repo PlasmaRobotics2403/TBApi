@@ -654,8 +654,11 @@ class EventStatus(Data):
 
     @property
     def alliance(self):
-        """Basic information about the team's playoff alliance."""
-        return TeamAlliance(self['alliance'])
+        """:class:`TeamAlliance`: Basic information about the team's playoff alliance, if available."""
+        if self['alliance'] != None:
+            return TeamAlliance(self['alliance'], self.parser, self.options)
+        else:
+            return None
 
 
 # Webcast Data Class: Represents a webcast for a given event and its corresponding data.
@@ -720,74 +723,31 @@ class Video(Data):
         return '<tbapi.Video: Video for {}>'.format(self['match'])
 
 
-# Alliance Data Class:  Represents an Alliance that participated in a given Match.
-class Alliance(Data):
-    """Alliance Data Class:  Represents an Alliance that participated in a given Match."""
-
-    @property
-    def score(self):
-        """The score earned by the represented Alliance in a given Match."""
-        return self['score']
-
-    @property
-    def team_keys(self):
-        """A list of team keys representing the teams that participated on the represented Alliance."""
-        return self['team_keys']
-
-    @property
-    def teams(self):
-        """A list of team keys representing the teams that participated on the represented Alliance."""
-        return self['team_keys']
-
-    @property
-    def surrogate_team_keys(self):
-        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
-        return self['surrogate_team_keys']
-
-    @property
-    def surrogate_teams(self):
-        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
-        return self['surrogate_team_keys']
-
-    @property
-    def surrogates(self):
-        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
-        return self['surrogate_team_keys']
-
-    # When referenced in terminal without called attribute, output alliance information.
-    def __repr__(self):
-        """Return alliance information when referenced."""
-        alliance_members = ''
-
-        for key in self['team_keys']:
-            alliance_members += key[3:] + ' '
-
-        return '<tbapi.Alliance: {}>'.format(alliance_members[:-1])
-
-
 # AllianceSet Data Class:  Wrapper for both Alliances that competed in a given Match.
 class AllianceSet(Data):
-    """AllianceSet Data Class:  Wrapper for both Alliances that competed in a given Match."""
+    """AllianceSet Data Class:  Wrapper for both :class:`Alliance` objects that competed in a given match."""
 
     @property
     def red(self):
-        """The red Alliance for a given Match."""
-        return Alliance(self['red'])
+        """:class:`Alliance`: The red Alliance for a given Match.
+            
+            Alias: *r*"""
+        return Alliance(self['red'], self.parser, self.options)
 
     @property
     def r(self):
-        """The red Alliance for a given Match."""
-        return Alliance(self['red'])
+        return Alliance(self['red'], self.parser, self.options)
 
     @property
     def blue(self):
-        """The blue Alliance for a given Match."""
-        return Alliance(self['blue'])
+        """:class:`Alliance`: The blue Alliance for a given Match.
+            
+            Alias: *b*"""
+        return Alliance(self['blue'], self.parser, self.options)
 
     @property
     def b(self):
-        """The blue Alliance for a given Match."""
-        return Alliance(self['blue'])
+        return Alliance(self['blue'], self.parser, self.options)
 
     # When referenced in terminal without called attribute, output alliance set information.
     def __repr__(self):
@@ -804,15 +764,85 @@ class AllianceSet(Data):
         return '<tbapi.AllianceSet: RED[{}], BLUE[{}]>'.format(red_alliance[:-2], blue_alliance[:-2])
 
 
+# Alliance Data Class:  Represents an Alliance that participated in a given Match.
+class Alliance(Data):
+    """Alliance Data Class:  Represents an Alliance that participated in a given Match."""
+    
+    @property
+    def score(self):
+        """The score earned by the represented Alliance in a given Match."""
+        return self['score']
+    
+    @property
+    def team_keys(self):
+        """A list of team keys representing the teams that participated on the represented Alliance."""
+        return self['team_keys']
+    
+    @property
+    def teams(self):
+        """:class:`DataList`: A list of :class:`Team` objects that participated on the represented Alliance."""
+        team_list = DataList([], [])
+
+        for team_key_item in self['team_keys']:
+            team_obj = self.parser.get_team(team_key_item, force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
+
+            team_list.append(team_obj)
+            team_list.raw.append(dict(team_obj))
+
+        return team_list
+    
+    @property
+    def surrogate_team_keys(self):
+        """A list of team keys representing teams that acted as surrogates on the represented Allliance."""
+        return self['surrogate_team_keys']
+    
+    @property
+    def surrogate_teams(self):
+        """:class:`DataList`: A list of :class:`Team` objects that acted as surrogates on the represented Allliance.
+            
+            Alias: *surrogates*"""
+        surrogate_team_list = DataList([], [])
+        
+        for team_key_item in self['surrogate_team_keys']:
+            team_obj = self.parser.get_team(team_key_item, force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
+            
+            surrogate_team_list.append(team_obj)
+            surrogate_team_list.raw.append(dict(team_obj))
+        
+        return surrogate_team_list
+    
+    @property
+    def surrogates(self):
+        surrogate_team_list = DataList([], [])
+        
+        for team_key_item in self['surrogate_team_keys']:
+            team_obj = self.parser.get_team(team_key_item, force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
+            
+            surrogate_team_list.append(team_obj)
+            surrogate_team_list.raw.append(dict(team_obj))
+        
+        return surrogate_team_list
+    
+    # When referenced in terminal without called attribute, output alliance information.
+    def __repr__(self):
+        """Return alliance information when referenced."""
+        alliance_members = ''
+        
+        for key in self['team_keys']:
+            alliance_members += key[3:] + ' '
+        
+        return '<tbapi.Alliance: {}>'.format(alliance_members[:-1])
+
+
 # TeamAlliance Data Class: Represents a Team's Association to a given Alliance.
 class TeamAlliance(Data):
     """TeamAlliance Class:  Represents a Team's Association to a given Alliance."""
 
     @property
     def backup(self):
-        """Information on Backup Swaps involving a given team."""
+        """:class:`Backup`: Information on Backup Swaps involving the associated team."""
         if self['backup'] != None:
-            return Backup(self['backup'])
+            return Backup(self['backup'], self.parser, self.options)
         else:
             return None
 
@@ -864,7 +894,7 @@ class Backup(Data):
     @property
     def team_out(self):
         """The Team that left the Alliance (in terms of playing)."""
-        return self['in']
+        return self['out']
 
     # When referenced in terminal without called attribute, output customized string.
     def __repr__(self):
@@ -874,15 +904,25 @@ class Backup(Data):
 
 # Breakdown Data Class: Fluid Match Statistics for a given Alliance in a given Match.
 class Breakdown(Data):
-    """Breakdown Class: Fluid Match Statistics for a given Alliance in a given Match."""
+    """Breakdown Class: Provides access to Fluid Match Statistics for a given Alliance in a given Match.
+        
+        Each FIRST Robotics Competition Game gathers different statistics that are related to it's gameplay.  This class provides access to these \"Fluid\" keys for use in your software."""
 
     # Get a fluid key from the internal data dictionary.
     def get(self, key):
-        """Get a fluid key from the internal data dictionary."""
+        """Get the statistic associated with a provided fluid key from the internal data dictionary based on it's reference name.  
+            
+            Raises a :class:`FluidKeyError` if the fluid key is not available in this :class:`Breakdown` object."""
         if not key in self.keys():
             raise FluidKeyError
         else:
             return self[key]
+
+    # Get a list of included fluid keys
+    @property
+    def list(self):
+        """A list of fluid keys that are represented by this :class:`Breakdown` object."""
+        return list(self.keys())
 
     # When referenced in terminal without called attribute, output customized string.
     def __repr__(self):
@@ -895,23 +935,25 @@ class BreakdownSet(Data):
 
     @property
     def red(self):
-        """Breakdown for the red Alliance for a given Match."""
-        return Breakdown(self['red'])
+        """Breakdown for the red Alliance for a given Match.
+            
+            Alias: *r*"""
+        return Breakdown(self['red'], self.parser, self.options)
 
     @property
     def r(self):
-        """Breakdown for the red Alliance for a given Match."""
-        return Breakdown(self['red'])
+        return Breakdown(self['red'], self.parser, self.options)
 
     @property
     def blue(self):
-        """Breakdown for the blue Alliance for a given Match."""
-        return Breakdown(self['blue'])
+        """Breakdown for the blue Alliance for a given Match.
+            
+            Alias: *b*"""
+        return Breakdown(self['blue'], self.parser, self.options)
 
     @property
     def b(self):
-        """Breakdown for the blue Alliance for a given Match."""
-        return Breakdown(self['blue'])
+        return Breakdown(self['blue'], self.parser, self.options)
 
     # When referenced in terminal without called attribute, output breakdown set information.
     def __repr__(self):
@@ -1008,7 +1050,7 @@ class Match(Data):
             modified_video['match'] = self['key']
             modified_video_list += [modified_video]
 
-        return DataList([Video(video_item) for video_item in modified_video_list], self['videos'])
+        return DataList([Video(video_item, self.parser, self.options) for video_item in modified_video_list], self['videos'])
 
     @property
     def winning_alliance(self):
@@ -1018,18 +1060,44 @@ class Match(Data):
     @property
     def alliances(self):
         """A Wrapper containing both alliances that participated in the represented match."""
-        return AllianceSet(self['alliances'])
+        return AllianceSet(self['alliances'], self.parser, self.options)
 
     @property
     def red_alliance(self):
         """The red Alliance that participated in the represented match."""
-        return Alliance(self['alliances']['red'])
+        return Alliance(self['alliances']['red'], self.parser, self.options)
 
     @property
     def blue_alliance(self):
         """The red Alliance that participated in the represented match."""
-        return Alliance(self['alliances']['blue'])
+        return Alliance(self['alliances']['blue'], self.parser, self.options)
+    
+    @property
+    def score_breakdown(self):
+        """:class:`BreakdownSet`: Fluid Statistics regarding the represented match.
+            
+            Alias: *breakdown*"""
+        return BreakdownSet(self['score_breakdown'], self.parser, self.options)
+    
+    @property
+    def breakdown(self):
+        return BreakdownSet(self['score_breakdown'], self.parser, self.options)
+    
+    @property
+    def teams(self):
+        """:class:`DataList`: A list of :class:`Team` objects that participated in the represented match, independant of alliance."""
+        team_keys = self['alliances']['blue']['team_keys'] + self['alliances']['red']['team_keys']
+        team_list = DataList([],[])
+        
+        for team_key_item in team_keys:
+            team_obj = self.parser.get_team(team_key_item, force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
+            
+            team_list.append(team_obj)
+            team_list.raw.append(dict(team_obj))
 
+        return team_list
+    
+    
     # When referenced in terminal without called attribute, output match information.
     def __repr__(self):
         """Return match information when referenced."""
