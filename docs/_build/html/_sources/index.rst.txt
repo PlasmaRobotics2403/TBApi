@@ -4,10 +4,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-#####################################################
-TBApi - A Python Wrapper for The Blue Alliance API v3
-#####################################################
-
 ************
 Installation
 ************
@@ -101,10 +97,10 @@ Robot
   :members:
 
 ======
-Social
+Media
 ======
 
-.. autoclass:: Social
+.. autoclass:: Media
   :members:
 
 =====
@@ -119,6 +115,34 @@ Event Status
 ============
 
 .. autoclass:: EventStatus
+  :members:
+
+=======
+Playoff
+=======
+
+.. autoclass:: Playoff
+  :members:
+
+=====
+Quals
+=====
+
+.. autoclass:: Quals
+  :members:
+
+=============
+Quals Ranking
+=============
+
+.. autoclass:: QualsRanking
+  :members:
+
+======
+Record
+======
+
+.. autoclass:: Record
   :members:
 
 =======
@@ -184,16 +208,50 @@ Match
 .. autoclass:: Match
   :members:
 
+=====
+Award
+=====
+
+.. autoclass:: Award
+  :members:
+
+=========
+Recipient
+=========
+
+.. autoclass:: Recipient
+  :members:
+
 **********
 Exceptions
 **********
 
+==========
+EmptyError
+==========
+
 .. autoclass:: EmptyError
+
+==========
+ParseError
+==========
 
 .. autoclass:: ParseError
 
+=============
+KeyInputError
+=============
+
 .. autoclass:: KeyInputError
 
+============
+OfflineError
+============
+
 .. autoclass:: OfflineError
+
+=============
+FluidKeyError
+=============
 
 .. autoclass:: FluidKeyError
