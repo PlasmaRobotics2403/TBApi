@@ -8,8 +8,8 @@ if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
 set SOURCEDIR=.
-set BUILDDIR=_build
-set SPHINXPROJ=TBApi
+set BUILDDIR=nbuild
+set SPHINXPROJ=TBApi-TBAv3PythonWrapper
 
 if "%1" == "" goto help
 

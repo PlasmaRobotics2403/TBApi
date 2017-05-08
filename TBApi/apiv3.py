@@ -64,7 +64,7 @@ class DataList(list):
     def filter(self, attr_name, attr_value):
         """Filter the stored objects by a given attribute with a given value.
 
-            Returns new DataList containing only Data Objects with attribute ``attr_name`` containing ``attr_value``."""
+        Returns new DataList containing only Data Objects with attribute ``attr_name`` containing ``attr_value``."""
 
         return_list = self.__class__([], [])
 
@@ -102,12 +102,12 @@ class DataList(list):
 class Data(dict):
     """Basic Data Class, extended with attributes for other Data Models.
 
-        All :class:`Data` objects are extensions of the :class:`dict` class, meaning that the raw JSON used to create these objects can be obtained by treating the object as a dictionary rather than an object.
+    All :class:`Data` objects are extensions of the :class:`dict` class, meaning that the raw JSON used to create these objects can be obtained by treating the object as a dictionary rather than an object.
 
-        :class:`Data` objects maintain a reference to the :class:`Parser` object that created them in order to live pull further information later on down the road.
+    :class:`Data` objects maintain a reference to the :class:`Parser` object that created them in order to live pull further information later on down the road.
 
-        .. warning::
-            When treating :class:`Data` objects as dictionaries, all data is returned "as-is" by TBA.  No futher processing is done to transform second-level dictionaries into their own :class:`Data` objects."""
+    .. warning::
+        When treating :class:`Data` objects as dictionaries, all data is returned "as-is" by TBA.  No futher processing is done to transform second-level dictionaries into their own :class:`Data` objects."""
     def __init__(self, json_array, parser, options=None):
         self.update(json_array)
         self.parser = parser
@@ -215,7 +215,7 @@ class Team(Data):
     def team_number(self):
         """Team Number of the represented team.
 
-            Alias: *number*"""
+        Alias: *number*"""
         return self['team_number']
 
     @property
@@ -226,7 +226,7 @@ class Team(Data):
     def nickname(self):
         """Nickname of the represented team.
 
-            Alias: *nick*"""
+        Alias: *nick*"""
         return self['nickname']
 
     @property
@@ -267,7 +267,7 @@ class Team(Data):
     def state_prov(self):
         """State or Province of the represented team.
 
-            Alias: *state*, *province*"""
+        Alias: *state*, *province*"""
         return self['state_prov']
 
     @property
@@ -297,7 +297,7 @@ class Team(Data):
     def lat(self):
         """Latitude of the represented team.
 
-            Alias: *latitude*"""
+        Alias: *latitude*"""
         return self['lat']
 
     @property
@@ -308,7 +308,7 @@ class Team(Data):
     def lng(self):
         """Longitude of the represented team.
 
-            Alias: *longitude*"""
+        Alias: *longitude*"""
         return self['lng']
 
     @property
@@ -462,7 +462,7 @@ class Media(Data):
 
     @property
     def preferred(self):
-        """Whether or not the given Social Media Presense is "preferred" by its Team."""
+        """Whether or not the given Social Media presense is "preferred" by its Team."""
         return self['preferred']
 
     @property
@@ -708,6 +708,17 @@ class EventStatus(Data):
     def playoff_status(self):
         return self['playoff_status_string']
 
+    @property
+    def qual(self):
+        """:class:`Quals`: A team's status in the qualification rounds of the given event.
+
+        Alias: *quals*"""
+        return Quals(self['qual'], self.parser, self.options)
+
+    @property
+    def quals(self):
+        return Quals(self['qual'], self.parser, self.options)
+
     # When referenced in terminal without called attribute, return modified response.
     def __repr__(self):
         """Modified Representation Response."""
@@ -761,17 +772,6 @@ class Playoff(Data):
         """The Team's Status in the Playoffs"""
         return self['status']
 
-    @property
-    def qual(self):
-        """:class:`Quals`: A team's status in the qualification rounds of the given event.
-        
-        Alias: *quals*"""
-        return Quals(self['qual'], self.parser, self.options)
-
-    @property
-    def quals(self):
-        return Quals(self['qual'], self.parser, self.options)
-
     # When referenced in terminal without called attribute, return modified response.
     def __repr__(self):
         """Modified Representation Response."""
@@ -816,6 +816,27 @@ class QualsRanking(Data):
     def qual_average(self):
         """The Average of a team in the qualification rounds."""
         return self['qual_average']
+
+    @property
+    def matches_played(self):
+        """The number of matches played by a team in the Qualification Rounds of the given event."""
+        return self['matches_played']
+
+    @property
+    def dq(self):
+        """The number of matches during which the given team was disqualified."""
+        return self['dq'] 
+
+    @property
+    def team_key(self):
+        """The `team_key` for the team represented by these data."""
+        return self['team_key']
+
+    @property
+    def team(self):
+        """:class:`Team`: The Team represented by these data."""
+        return self.parser.get_team(self['team_key'], force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
+
 
     # Return rank when converted to an integer
     def __int__(self):
@@ -1419,10 +1440,23 @@ class CacheTable(object):
 
 # Main Parser Class:  All requests routed through this class's methods.
 class Parser:
-    """TBA Parser Class: Routes API requests and handles caching. Requires v3 API Key from TBA."""
+    """TBA Parser Class: Routes API requests and handles caching. Requires v3 API Key from TBA.
+
+    :param str api_key: API Key used for connection to The Blue Alliance API Servers.  Get an API Key from your `TBA Account Settings <tba_account_settings_>`_.
+    :param bool cache: *(opt)* Enabling of the In-Built Caching System. *(default: True)*
+    :param bool local: *(opt)* Store cache Database in the local directory rather than globally in the python directory. *(default: False)*
+    :param bool force_cache: *(opt)* Force the :class:`Parser` to pull data for the In-Built Cache before attempting TBA Connection. *(default: False)*
+    :param bool log_cache: *(opt)* Log Caching Information to the Terminal while attempting to interact with the In-Built Cache. *(default: False)*
+    :param int cache_multiplier: *(opt)* Multiplier for die-times of cache data. Allows data to be used by the standard caching methods after their standard accuracy period. *(default: 1)*
+    
+    All Parser Class Methods have the following optional arguments:
+
+    :param bool force_new: *(opt)* Force a new request from The Blue Alliance servers, ignoring the cache response or 304 Response Headers. *(default: False)*
+    :param bool force_cache: *(opt)* Force a call to the cache, regardless of global cache settings. *(default: False)*
+    :param bool log_cache: *(opt)* Log Caching Information to the Terminal while attempting to interact with the In-Built Cache. *(default: False)*"""
 
     # Initiate Information needed for connection to TBA v3 (api_key)
-    def __init__(self, api_key, *, cache=True, force_cache=False, log_cache=False, cache_multiplier=1):
+    def __init__(self, api_key, *, cache=True, local=False, force_cache=False, log_cache=False, cache_multiplier=1):
         self.api_key = api_key # TBA API v3 API key
         self.cache = cache
         self.force_cache = force_cache
@@ -1431,15 +1465,19 @@ class Parser:
         self.base_url = 'http://www.thebluealliance.com/api/v3'
 
         if self.cache:
-            self.storage_path = os.path.dirname(sys.executable) + '/.tbapi'
+            if local is False:
+                self.storage_path = os.path.dirname(sys.executable) + '/.tbapi'
 
-            if not os.path.exists(self.storage_path):
-                try:
-                    os.makedirs(self.storage_path)
-                except:
-                    self.storage_path = os.getcwd()
+                if not os.path.exists(self.storage_path):
+                    try:
+                        os.makedirs(self.storage_path)
+                    except:
+                        self.storage_path = os.getcwd()
 
-            self.cache_db = sq.Connect(self.storage_path + '/cache')
+                self.cache_db = sq.Connect(self.storage_path + '/cache')
+            else:
+                self.cache_db = sq.Connect('tbapi-cache')
+
 
             if not self.cache_db.table('cache_data').tableExists():
                 cache_preset = CacheTable()
@@ -1452,14 +1490,16 @@ class Parser:
 
     # Method to pull JSON array from TBA v3 API.  Includes Caching and Offline Support.
     def pull_response_json(self, path, *, force_new=False, force_cache=False, log_cache=False):
-        """Pull the JSON response to a given path from the TBA API servers or the response cache."""
+        """Pull the JSON response to a given path from the TBA API servers or the response cache.
+        
+        :param string path: The URL to pull data from, without the base string 'http://www.thebluealliance.com/api/v3'."""
         
         if not path.startswith('/'):
             path = '/' + path
 
         current_time = datetime.datetime.now() # Get the Current Time at the start of method execution
 
-        if self.cache and force_new == False: # If caching is enabled, and a new response is not forced, attempt pulling from cache
+        if (self.cache or force_cache) and force_new == False: # If caching is enabled, and a new response is not forced, attempt pulling from cache
 
             cache_reply = self.cache_db.table('cache_data').select('RESPONSE', 'REQUESTED', 'LAST_MODIFIED', 'MAX_AGE').where('REQUEST').equals(path).execute() # Query Cache Database for last stored response
 
@@ -1593,7 +1633,10 @@ class Parser:
 
     # Get a List of FRC Teams
     def get_team_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Team` objects.  'page' and 'year' values optional."""
+        """:class:`DataList`: a list of :class:`Team` objects.
+        
+        :param int page: *(opt)* The page of teams to fetch.  Argument must be named explicitly when passing.  If not included, method will pull all available pages.
+        :param int year: *(opt)* The year to fetch competing teams for. Argument must be named explicitly when passing.  If not included, method will pull all teams that have ever competed and are recorded in the TBA databases."""
         if not page is None:
             return self.__get_team_list_page(page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -1624,7 +1667,10 @@ class Parser:
 
     # Get a List of FRC Team Keys
     def get_team_key_list(self, *, page=None, year=None, force_new=False, force_cache=False, log_cache=False):
-        """Get a list of team keys.  'page' and 'year' values optional."""
+        """Get a list of team keys.
+
+        :param int page: *(opt)* The page of teams to fetch.  Argument must be named explicitly when passing.  If not included, method will pull all available pages.
+        :param int year: *(opt)* The year to fetch competing teams for. Argument must be named explicitly when passing.  If not included, method will pull all teams that have ever competed and are recorded in the TBA databases."""
         if not page is None:
             return self.__get_team_list_page(page, year=year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -1660,31 +1706,41 @@ class Parser:
 
     # Get information about a single FRC Team by team number or team key
     def get_team(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`Team`: Get a single team, by 'team_key' or 'team_number'."""
+        """:class:`Team`: Get a single team.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`."""
         return Team(self.pull_response_json('/team/{}'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache), self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache})
 
     # Get a list containing the years in which a given team has participated
     def get_team_years_participated(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`list`: a list containing the years in which a given team has participated."""
+        """:class:`list`: Get a list containing the years in which a given team has participated.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`."""
         return self.pull_response_json('/team/{}/years_participated'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
     
     # Get a list of Districts that the given team has competed in
     def get_team_districts(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`District` objects in which the given team has competed in."""
+        """:class:`DataList`: a list of :class:`District` objects in which the given team has competed in.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`."""
         district_list = self.pull_response_json('/team/{}/districts'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([District(district_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for district_item in district_list], district_list)
 
     # Get a list of Robots built and operated by a given team
     def get_team_robots(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Robot` objects built and operated by a given team."""
+        """:class:`DataList`: a list of :class:`Robot` objects built and operated by a given team.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`."""
         robot_list = self.pull_response_json('/team/{}/robots'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Robot(robot_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for robot_item in robot_list], robot_list)
 
     # Get a list of Social Media Presences operated by a given team.
     def get_team_social_media(self, team_identifier, *, force_new=False, force_cache=False, log_cache=False):
         """:class:`DataList`: a list of :class:`Media` objects (Social Media Prescenses) operated by a given team.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
             
-            Alias: *get_team_social*"""
+        Alias: *get_team_social*"""
         social_list = self.pull_response_json('/team/{}/social_media'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Media(social_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for social_item in social_list], social_list)
 
@@ -1694,7 +1750,10 @@ class Parser:
 
     # Get a list of events attended by a given team
     def get_team_events(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Event` objects attended by a given team."""
+        """:class:`DataList`: a list of :class:`Event` objects attended by a given team.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg int year: *(opt)* The Year to pull events for.  If not included, method will pull all events in which a team has competed in."""
         if not year:
             event_list = self.pull_response_json('/team/{}/events'.format(self.__get_team_key(team_identifier)), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
             return DataList([Event(event_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for event_item in event_list], event_list)
@@ -1704,30 +1763,45 @@ class Parser:
 
     # Get a list of Matches played by a given Team at a given Event
     def get_team_event_matches(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Match` objects played by a given Team at a given Event."""
+        """:class:`DataList`: a list of :class:`Match` objects played by a given Team at a given Event.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg str event_key: The :attr:`event_key` of the desired Event, following the format `YYYY[EVENT_CODE]`, where `YYYY` is the the year and `EVENT_CODE` is the `event code <https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc>`_ of the event."""
         match_list = self.pull_response_json('/team/{}/event/{}/matches'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Match(match_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for match_item in match_list], match_list)
 
     # Get a list of Awards presented to a given Team at a given Event
     def get_team_event_awards(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team at a given Event."""
+        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team at a given Event.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg str event_key: The :attr:`event_key` of the desired Event, following the format `YYYY[EVENT_CODE]`, where `YYYY` is the the year and `EVENT_CODE` is the `event code <https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc>`_ of the event."""
         award_list = self.pull_response_json('/team/{}/event/{}/awards'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Award(award_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for award_item in award_list], award_list)
 
     # Get information about the status of a given team at a given event
     def get_team_event_status(self, team_identifier, event_key, *, force_new=False, force_cache=False, log_cache=False):
-        """Get information about the status of a given team at a given event."""
+        """Get information about the status of a given team at a given event.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg str event_key: The :attr:`event_key` of the desired Event, following the format `YYYY[EVENT_CODE]`, where `YYYY` is the the year and `EVENT_CODE` is the `event code <https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc>`_ of the event."""
         return self.pull_response_json('/team/{}/event/{}/status'.format(self.__get_team_key(team_identifier), event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
 
     # Get a list of Awards presented to a given Team throughout their History
     def get_team_awards(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team throughout their History."""
+        """:class:`DataList`: a list of :class:`Award` objects presented to a given Team throughout their History.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg int year: *(opt)* The Year to pull awards for.  If not included, method will pull all awards won by the team."""
         award_list = self.pull_response_json('/team/{}/awards{}'.format(self.__get_team_key(team_identifier), '/{}'.format(year) if year else ''), force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         return DataList([Award(award_item, self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache}) for award_item in award_list], award_list)
 
     # Get a list of Matches played by a given Team throughout their History
     def get_team_matches(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Match` objects played by a given Team throughout their History"""
+        """:class:`DataList`: a list of :class:`Match` objects played by a given Team throughout their History.
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg int year: *(opt)* The Year to pull matches for.  If not included, method will pull all matches played by the team."""
         if year:
             return self.__get_team_year_matches(team_identifier, year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -1762,7 +1836,10 @@ class Parser:
 
     # Get a list of Media provided by a given Team throughout their History
     def get_team_media(self, team_identifier, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: a list of :class:`Media` objects provided by a given Team throughout their History"""
+        """:class:`DataList`: a list of :class:`Media` objects provided by a given Team throughout their History
+        
+        :arg int/str team_identifier: Either a team's :attr:`team_key` or their :attr:`team_number`.
+        :arg int year: *(opt)* The Year to pull media for.  If not included, method will pull all media provided by the team."""
         if year:
             return self.__get_team_year_media(team_identifier, year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -1797,7 +1874,9 @@ class Parser:
 
     # Get a list of Events that took place in a given year or throughout FIRST history
     def get_event_list(self, year=None, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`DataList`: Get a list of :class:`Event` objects."""
+        """:class:`DataList`: Get a list of :class:`Event` objects.
+        
+        :arg int year: The year to grab events for."""
         if year:
             return self.__get_event_list_year(year, force_new=force_new, force_cache=force_cache, log_cache=log_cache)
         else:
@@ -1829,5 +1908,7 @@ class Parser:
 
     # Get a single event, by event key.
     def get_event(self, event_key, *, force_new=False, force_cache=False, log_cache=False):
-        """:class:`Event`: Get a single event by it's event_key."""
+        """:class:`Event`: Get a single event by it's event_key.
+        
+        :arg str event_key: The :attr:`event_key` of the desired Event, following the format `YYYY[EVENT_CODE]`, where `YYYY` is the the year and `EVENT_CODE` is the `event code <https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc>`_ of the event."""
         return Event(self.pull_response_json('/event/{}'.format(event_key), force_new=force_new, force_cache=force_cache, log_cache=log_cache), self, {'force_new':force_new, 'force_cache':force_cache, 'log_cache':log_cache})
