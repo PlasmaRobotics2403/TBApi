@@ -47,7 +47,7 @@ class FluidKeyError(Exception):
 
 # List-Extension Class:  Adds extra functionality to lists used for data-returns
 class DataList(list):
-    """List-Extension used for storing data objects with extra information."""
+    """Extension of :class:`list` used for storing data objects with extra information."""
     def __init__(self, data_list, json_array, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -81,8 +81,9 @@ class DataList(list):
     @property
     def raw(self):
         """Returns the raw JSON array used to create the :class:`DataList` object and it's contained :class:`Data` objects.
-
-        Alias: *json_array* (modifiable dictionary available for concatenation or modification)"""
+        
+        .. warning::
+            `raw` data attribute is a non-modifiable dictionary containing the represented JSON array.  If modification is neccesary, a independant local dictionary can be created through the use of `dict(obj.raw)`.  The internal JSON directory is also modifiable and can be accessed through `obj.json_array`.  Modifications to either of these arrays will not be reflected in the Data Objects stored within the :class:`DataList`, as TBA return data is not meant to be modified."""
         return self.json_array
 
     # Customize Object Description Output to identify the given list as a DataList
@@ -100,14 +101,17 @@ class DataList(list):
 
 # Basic Data Class:  Stores information about data returned by TBA by the parser.
 class Data(dict):
-    """Basic Data Class, extended with attributes for other Data Models.
+    """Basic Data Class, extended with attributes for other Data Models.  You should never have to create a :class:`Data` by yourself.
 
     All :class:`Data` objects are extensions of the :class:`dict` class, meaning that the raw JSON used to create these objects can be obtained by treating the object as a dictionary rather than an object.
 
     :class:`Data` objects maintain a reference to the :class:`Parser` object that created them in order to live pull further information later on down the road.
 
     .. warning::
-        When treating :class:`Data` objects as dictionaries, all data is returned "as-is" by TBA.  No futher processing is done to transform second-level dictionaries into their own :class:`Data` objects."""
+        When treating :class:`Data` objects as dictionaries, all data is returned "as-is" by TBA.  No futher processing is done to transform second-level dictionaries into their own :class:`Data` objects.
+
+    .. warning::
+        Modifications to the internal dictionary structure of a :class:`Data` or derived object will be reflected in the values returned by the object."""
     def __init__(self, json_array, parser, options=None):
         self.update(json_array)
         self.parser = parser
@@ -125,7 +129,7 @@ class Data(dict):
 
 # Status Data Class: Represents the Status of The Blue Alliance API v3.
 class Status(Data):
-    """Status Data Class: Represents the Status of The Blue Alliance API v3 and it's associated applications."""
+    """Status :class:`Data` Class: Represents the Status of The Blue Alliance API v3 and it's associated applications."""
 
     @property
     def android(self):
@@ -168,7 +172,7 @@ class Status(Data):
 
 # App Data Class: Represents TBA Mobile App Information.
 class App(Data):
-    """App Data Class: Represents TBA Mobile App Information."""
+    """App :class:`Data` Class: Represents TBA Mobile App Information."""
 
     @property
     def latest_app_version(self):
@@ -204,7 +208,7 @@ class App(Data):
 
 # Team Data Class: Provides team information returned by TBA by the parser.
 class Team(Data):
-    """Team Data Class: Provides information regarding a given team."""
+    """Team :class:`Data` Class: Provides information regarding a given team."""
 
     @property
     def key(self):
@@ -348,7 +352,7 @@ class Team(Data):
 
 # District Data Class: Provides information about a given district.
 class District(Data):
-    """District Data Class: Provides information regarding a given district."""
+    """District :class:`Data` Class: Provides information regarding a given district."""
 
     @property
     def key(self):
@@ -388,7 +392,7 @@ class District(Data):
 
 # Robot Data Class: Provides information about an individual robot beloging to a team in a given year.
 class Robot(Data):
-    """Robot Data Class: Provides information about a robot belonging to a team in a given year."""
+    """Robot :class:`Data` Class: Provides information about a robot belonging to a team in a given year."""
 
     @property
     def key(self):
@@ -443,7 +447,7 @@ class Robot(Data):
 
 # Social Media Data Class: Represents a team's presense on a social media platform.
 class Media(Data):
-    """Media Data Class: Represents a team's presense on a social media platform."""
+    """Media :class:`Data` Class: Represents a team's presense on a social media platform."""
 
     @property
     def details(self):
@@ -478,7 +482,7 @@ class Media(Data):
 
 # Event Data Class: Represents a given event and it's corresponding data.
 class Event(Data):
-    """Event Data Class:  Represents a given Event and it's corresponding data."""
+    """Event :class:`Data` Class:  Represents a given Event and it's corresponding data."""
 
     @property
     def key(self):
@@ -650,7 +654,7 @@ class Event(Data):
 
 # EventStatus Data Class: Represents the status of a team at a given event.
 class EventStatus(Data):
-    """EventStatus Data Class: Represents the status of a team at a given event.
+    """EventStatus :class:`Data` Class: Represents the status of a team at a given event.
 
         TODO: Finish this data class and add object generation to :class:`Parser`"""
 
@@ -727,7 +731,7 @@ class EventStatus(Data):
 
 # Playoff Data Class: Represents a team's status in the playoffs of an event.
 class Playoff(Data):
-    """Playoff Data Class:  Represents a team's status in the playoffs of a given Event."""
+    """Playoff :class:`Data` Class:  Represents a team's status in the playoffs of a given Event."""
 
     @property
     def current_level_record(self):
@@ -780,7 +784,7 @@ class Playoff(Data):
 
 # Quals Data Class:  Represents a team's status in the qualification rounds at a given event.
 class Quals(Data):
-    """Quals Data Class:  Represents a team's status in the qualification rounds at a given event."""
+    """Quals :class:`Data` Class:  Represents a team's status in the qualification rounds at a given event."""
 
     @property
     def num_teams(self):
@@ -793,6 +797,16 @@ class Quals(Data):
         self['ranking']['sort_order_info'] = self['sort_order_info']
         return QualsRanking(self['ranking'], self.parser, self.options)
 
+    @property
+    def sort_order_info(self):
+        """:class:`DataList` of :class:`QualsSortInfo`: A list containing information about the different categories used to sort teams in the rankings."""
+        return DataList([QualsSortInfo(sort_item, self.parser, self.options) for sort_item in self['sort_order_info']], self['sort_order_info'])
+
+    @property
+    def status(self):
+        """A string representing the status of the team during quals."""
+        return self['status']
+
     # When referenced in terminal without called attribute, return modified response.
     def __repr__(self):
         """Modified Representation Response."""
@@ -800,7 +814,7 @@ class Quals(Data):
 
 
 class QualsRanking(Data):
-    """QualsRanking Data Class:  Represents a team's rank in the qualification rounds at a given event."""
+    """QualsRanking :class:`Data` Class:  Represents a team's rank in the qualification rounds at a given event."""
 
     @property
     def rank(self):
@@ -825,7 +839,19 @@ class QualsRanking(Data):
     @property
     def dq(self):
         """The number of matches during which the given team was disqualified."""
-        return self['dq'] 
+        return self['dq']
+
+    @property
+    def sort_orders(self):
+        """:class:`list`: The values used to sort the given teams in the rankings.  Categorical information can be found in `sort_order_info`.
+
+        Categories and values are split due to fluidity of ranking values between years."""
+        return self['sort_orders']
+
+    @property
+    def sort_order_info(self):
+        """:class:`DataList` of :class:`QualsSortInfo`: A list containing information about the different categories used to sort teams in the rankings."""
+        return DataList([QualsSortInfo(sort_item, self.parser, self.options) for sort_item in self['sort_order_info']], self['sort_order_info'])
 
     @property
     def team_key(self):
@@ -836,7 +862,6 @@ class QualsRanking(Data):
     def team(self):
         """:class:`Team`: The Team represented by these data."""
         return self.parser.get_team(self['team_key'], force_new=self.options['force_new'], force_cache=self.options['force_cache'], log_cache=self.options['log_cache'])
-
 
     # Return rank when converted to an integer
     def __int__(self):
@@ -854,9 +879,24 @@ class QualsRanking(Data):
         return '<tbapi.QualsRanking: Rank {}>'.format(str(self['rank']))
 
 
+# QualsSortInfo Data Class:  Represents Ranking sort information
+class QualsSortInfo(Data):
+    """QualsSortInfo :class:`Data` Class:  Represents Ranking sort information."""
+
+    @property
+    def name(self):
+        """The Name of the sort-order category."""
+        return self['name']
+
+    @property
+    def precision(self):
+        """The Precision of the sort-order category."""
+        return self['precision']
+
+
 # Record Data Class: Represents a team's Win Loss Tie record at a given event or in a given level of an event.
 class Record(Data):
-    """Record Data Class: Represents a team's Win Loss Tie record at a given event or in a given level of an event."""
+    """Record :class:`Data` Class: Represents a team's Win Loss Tie record at a given event or in a given level of an event."""
 
     @property
     def wins(self):
@@ -924,7 +964,7 @@ class Record(Data):
 
 # Webcast Data Class: Represents a webcast for a given event and its corresponding data.
 class Webcast(Data):
-    """Webcast Data Class: Represents a webcast for a given event and its corresponding data."""
+    """Webcast :class:`Data` Class: Represents a webcast for a given event and its corresponding data."""
 
     @property
     def channel(self):
@@ -966,7 +1006,7 @@ class Webcast(Data):
 
 # Video Data Class: Represents a video as posted on The Blue Alliance.
 class Video(Data):
-    """Video Data Class: Represents a video as posted on The Blue Alliance."""
+    """Video :class:`Data` Class: Represents a video as posted on The Blue Alliance."""
 
     @property
     def key(self):
@@ -986,7 +1026,7 @@ class Video(Data):
 
 # AllianceSet Data Class:  Wrapper for both Alliances that competed in a given Match.
 class AllianceSet(Data):
-    """AllianceSet Data Class:  Wrapper for both :class:`Alliance` objects that competed in a given match."""
+    """AllianceSet :class:`Data` Class:  Wrapper for both :class:`Alliance` objects that competed in a given match."""
 
     @property
     def red(self):
@@ -1027,7 +1067,7 @@ class AllianceSet(Data):
 
 # Alliance Data Class:  Represents an Alliance that participated in a given Match.
 class Alliance(Data):
-    """Alliance Data Class:  Represents an Alliance that participated in a given Match."""
+    """Alliance :class:`Data` Class:  Represents an Alliance that participated in a given Match."""
 
     @property
     def score(self):
@@ -1097,7 +1137,7 @@ class Alliance(Data):
 
 # TeamAlliance Data Class: Represents a Team's Association to a given Alliance.
 class TeamAlliance(Data):
-    """TeamAlliance Class:  Represents a Team's Association to a given Alliance."""
+    """TeamAlliance :class:`Data` Class:  Represents a Team's Association to a given Alliance."""
 
     @property
     def backup(self):
@@ -1145,7 +1185,7 @@ class TeamAlliance(Data):
 
 # Backup Data Class: Information on Backup Swaps involving a given Team on a given Alliance at a given Event.
 class Backup(Data):
-    """Backup Data Class: Information on Backup Swaps involving a given Team on a given Alliance at a given Event."""
+    """Backup :class:`Data` Class: Information on Backup Swaps involving a given Team on a given Alliance at a given Event."""
 
     @property
     def team_in(self):
@@ -1165,7 +1205,7 @@ class Backup(Data):
 
 # Breakdown Data Class: Fluid Match Statistics for a given Alliance in a given Match.
 class Breakdown(Data):
-    """Breakdown Class: Provides access to Fluid Match Statistics for a given Alliance in a given Match.
+    """Breakdown :class:`Data` Class: Provides access to Fluid Match Statistics for a given Alliance in a given Match.
 
         Each FIRST Robotics Competition Game gathers different statistics that are related to it's gameplay.  This class provides access to these \"Fluid\" keys for use in your software."""
 
@@ -1192,7 +1232,7 @@ class Breakdown(Data):
 
 # BreakdownSet Data Class: Wrapper for Breakdowns for a given Match.
 class BreakdownSet(Data):
-    """BreakdownSet Data Class: Wrapper for Breakdowns for a given Match."""
+    """BreakdownSet :class:`Data` Class: Wrapper for Breakdowns for a given Match."""
 
     @property
     def red(self):
@@ -1224,7 +1264,7 @@ class BreakdownSet(Data):
 
 # Match Data Class: Represents a match played at a given event and its corresponding data.
 class Match(Data):
-    """Match Data Class: Represents a match at a given event and its corresponding data."""
+    """Match :class:`Data` Class: Represents a match at a given event and its corresponding data."""
 
     @property
     def key(self):
@@ -1366,7 +1406,7 @@ class Match(Data):
 
 # Awards Data Class: Represents an Award given at a defined Event.
 class Award(Data):
-    """Awards Data Class: Represents an Award given at a defined Event."""
+    """Awards :class:`Data` Class: Represents an Award given at a defined Event."""
 
     @property
     def name(self):
@@ -1406,7 +1446,7 @@ class Award(Data):
 
 # Recipient Data Class: Represents the Recipient of an Award given at a defined Event.
 class Recipient(Data):
-    """Recipient Data Class: Represents the Recipient of an Award given at a defined Event."""
+    """Recipient :class:`Data` Class: Represents the Recipient of an Award given at a defined Event."""
 
     @property
     def team_key(self):
